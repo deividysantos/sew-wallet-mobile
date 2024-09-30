@@ -1,23 +1,42 @@
-import { StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, View, Alert } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { Link, Redirect, Stack, useRouter } from 'expo-router';
+import { Link, Stack, useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { UsuarioRepository } from '@/repositories/UsuarioRespository';
+import { UsuarioLogin } from '@/types/usuario';
 
 export default function Index() {
   const router = useRouter();
   const backgroundColorButton = useThemeColor({}, 'secondary');
   const primaryColor = useThemeColor({}, 'primary');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
+  const { user, login, logout } = useAuth();
 
-  const [ login, setLogin ] = useState({email: '', senha: ''});
+  const [ formLogin, setformLogin ] = useState<UsuarioLogin>({email: 'teste@teste.com', senha: 'senha123'});
+  const [ verSenha, setVerSenha ] = useState(false);
+  const hiddeChar = '*';
+  async function handleLogin () {
 
-  const handleLogin = () => {    
-    router.replace('/(tabs)');
-    if ((login.email == 'teste@teste.com') && (login.senha == '123')) {     
-      
+    try {
+      const usuarioRepository = new UsuarioRepository;
+      const usuario_id = await usuarioRepository.verificaCredenciais(formLogin);
+
+      if (usuario_id) {
+        const dadosUsuario = await usuarioRepository.buscaDadosUsuario(usuario_id)
+
+        if (dadosUsuario){
+          login(dadosUsuario);
+          router.replace('/(tabs)');
+        }        
+      } else {
+        Alert.alert('Dados incorretos!', 'Não foi possível entrar com os dados informados, tente novamente.', [{text: 'Tentar Novamente', style: 'cancel'}])
+      }
+    } catch (error: any) {
+      Alert.alert ( 'Dado inválido!' , error.message , [{text: 'Ok', style: 'cancel'}] );
     }
   }
 
@@ -27,7 +46,7 @@ export default function Index() {
       <SafeAreaView style={{backgroundColor:backgroundHard, flex: 1}}>
         <StatusBar
             backgroundColor={backgroundHard}
-            barStyle={'light-content'}
+            barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
             translucent={false}
         />        
           
@@ -37,14 +56,14 @@ export default function Index() {
             <ThemedTextInput 
               style={styles.textInput} 
               placeholder='Email' 
-              value={login.email} 
-              onChangeText={novoEmail => setLogin({ email: novoEmail, senha: login.senha })}/>
+              value={formLogin.email} 
+              onChangeText={novoEmail => setformLogin({ email: novoEmail, senha: formLogin.senha })}/>
 
             <ThemedTextInput 
               style={styles.textInput} 
               placeholder='Senha' 
-              value={login.senha}
-              onChangeText={novaSenha => setLogin({email: login.email, senha: novaSenha})}/>
+              value={ formLogin.senha }
+              onChangeText={novaSenha => setformLogin({email: formLogin.email, senha: novaSenha})}/>
           </View>
           
           <TouchableOpacity 

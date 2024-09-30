@@ -2,7 +2,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet, StatusBar, SafeAreaView, View, TouchableOpacity } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/ThemedText';
 
@@ -18,7 +18,7 @@ export default function ConfiguracoesScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: backgroundHard }]}>
         <StatusBar
             backgroundColor={backgroundHard}
-            barStyle={'light-content'}
+            barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
             translucent={false}
         /> 
       <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
@@ -45,12 +45,12 @@ export default function ConfiguracoesScreen() {
               <ThemedText>Categorías</ThemedText>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.option} onPress={() => router.push('/cadastros/contas')}>
+            <TouchableOpacity style={styles.option} onPress={() => router.push('/cadastros/contas/lista')}>
               <MaterialCommunityIcons size={20} name="bank-outline" style={{color: primaryColor}} />
               <ThemedText>Contas</ThemedText>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.option} onPress={() => router.push('/cadastros/catoes')}>
+            <TouchableOpacity style={styles.option} onPress={() => router.push('/cadastros/cartoes')}>
               <Ionicons size={20} name="card-outline" style={{color: primaryColor}} />
               <ThemedText>Cartões</ThemedText>
             </TouchableOpacity>
@@ -64,7 +64,6 @@ const styles = StyleSheet.create({
   container: {
       flex: 1,
       padding: 20,
-      
     },
     cardConfig: {
       paddingHorizontal: 15,
