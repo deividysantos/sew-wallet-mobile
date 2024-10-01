@@ -1,10 +1,12 @@
 import { StyleSheet, StatusBar, SafeAreaView, View, TouchableOpacity } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation, useRouter } from 'expo-router';
-import { useEffect } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
+import BottomSheet from "@gorhom/bottom-sheet";
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedTextInput } from '@/components/ThemedTextInput';
+import { LookUpComboBox, FieldResult } from '@/components/LookUpComboBox';
 
 export default function ContasScreen() {
   const backgroundHard = useThemeColor({}, 'backgroundHard');
@@ -15,18 +17,29 @@ export default function ContasScreen() {
 
   const router = useRouter();
   const navigation = useNavigation();
+  
   useEffect(() => {
     navigation.setOptions({ title: 'Cadastrar Conta', headerTintColor: text, headerStyle: { backgroundColor: backgroundSoft } })
   }, [navigation])
-  
+
+  const data = [{text: 'picpay', value: '1'}, {text: 'banco do brasil', value: '2'}]
+  const sheetRef = useRef<BottomSheet>(null);
+
+  const openLoopUp = useCallback((index: number) => {
+    sheetRef.current?.expand();
+  }, []);  
+
+  const [ banco, setBanco ] = useState<FieldResult>({ text: '', value: '' });
+
   return (
-    
+  
     <SafeAreaView style={[styles.container, { backgroundColor: backgroundHard }]}>
       <StatusBar
           backgroundColor={backgroundHard}
           barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
           translucent={false}
       /> 
+      <LookUpComboBox children dataList={data} sheetRef={sheetRef} selectedValue={setBanco} /> 
 
       <View style={{flex: 1, justifyContent: 'space-between'}}>
         <View style={{ gap: 15 }}>    
@@ -44,7 +57,8 @@ export default function ContasScreen() {
             <ThemedTextInput 
               
               placeholder='Senha' 
-              //value={ 'teste' }
+              value={ banco.text }
+              onPressIn={() => openLoopUp(1)}
               onChangeText={() => {}}/> 
           </View>
 
@@ -66,10 +80,7 @@ export default function ContasScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.button, styles.buttonConfirm, { backgroundColor: secondaryColor, borderColor: primaryColor }]}>
-            <ThemedText style={{color: primaryColor
-              git commit - ''wip'' 
-              git push origin main
-            }}>
+            <ThemedText style={{color: primaryColor}}>
               Cadastrar
             </ThemedText>
           </TouchableOpacity>

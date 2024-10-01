@@ -3,6 +3,7 @@ import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -27,15 +28,17 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AuthProvider>
-        <Stack screenOptions={{animation: 'slide_from_right'}}>
-          <Stack.Screen name="index" options={{ headerShown: false }}/> 
-          <Stack.Screen name="cadastrar" options={{ headerShown: false }}/>
-          <Stack.Screen name="+not-found" />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
-      </AuthProvider>
-    </ThemeProvider>
+    <GestureHandlerRootView>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <AuthProvider>
+          <Stack screenOptions={{animation: 'slide_from_right'}}>
+            <Stack.Screen name="index" options={{ headerShown: false }}/> 
+            <Stack.Screen name="cadastrar" options={{ headerShown: false }}/>
+            <Stack.Screen name="+not-found" />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          </Stack>
+        </AuthProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
