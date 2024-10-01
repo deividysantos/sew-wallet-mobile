@@ -10,24 +10,25 @@ export class ContaRepository {
             throw Error('Nome de conta de tamanho inválido!');
         }
 
-        let result = await db.getFirstAsync<{CONTA_ID: number}>('SELECT CONTA_ID FROM CONTAS WHERE USUARIO_ID = ? AND NOME = ?', conta.USUARIO_ID, conta.NOME);
+        let result = await db.getFirstAsync<{CONTA_ID: number}>('SELECT CONTA_ID FROM CONTA WHERE USUARIO_ID = ? AND NOME = ?', conta.USUARIO_ID, conta.NOME);
 
         if (result?.CONTA_ID) {
             throw Error('Você já possui uma conta com este nome!');
         }
-
+        console.log('dentro');
         result = null;
         
         const statement = await db.prepareAsync('INSERT INTO CONTA (BANCO_ID, USUARIO_ID, NOME) VALUES ($banco_id, $usuario_id, $nome)');
 
         try {
-            await statement.executeAsync({$banco_id: conta.BANCO_ID, $usuario_id: conta.USUARIO_ID, $nome: conta.NOME});
+            await statement.executeAsync({$banco_id: conta.BANCO_ID, $usuario_id: conta.USUARIO_ID, $nome: conta.NOME});            
         } finally {
             await statement.finalizeAsync();
         }
 
-        result = await db.getFirstAsync<{CONTA_ID: number}>('SELECT CONTA_ID FROM CONTAS WHERE USUARIO_ID = ? AND NOME = ?', conta.USUARIO_ID, conta.NOME);
 
+        result = await db.getFirstAsync<{CONTA_ID: number}>('SELECT CONTA_ID FROM CONTA WHERE USUARIO_ID = ? AND NOME = ?', conta.USUARIO_ID, conta.NOME);
+        console.log(conta);
         return result?.CONTA_ID ?? null;
     }
 

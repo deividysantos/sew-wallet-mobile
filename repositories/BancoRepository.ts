@@ -5,7 +5,6 @@ import { Banco } from "@/types/banco";
 export class BancoRepository {
 
     async getAll (): Promise<Banco[]|null> {
-        console.log('teste');
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
         const result = await db.getAllAsync<Banco>('SELECT BANCO_ID, NOME FROM BANCO');
 

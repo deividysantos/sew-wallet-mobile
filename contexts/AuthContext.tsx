@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface AuthContextType {
-  user: {nome: string, email: string, usuario_id: number} | null;
+  user: {nome: string, email: string, usuario_id: number};
   login: (userData: any) => void;
   logout: () => void;
 }

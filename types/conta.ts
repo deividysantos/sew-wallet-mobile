@@ -1,5 +1,4 @@
 export type Conta = {
-    CONTA_ID: number,
     BANCO_ID: number,
     USUARIO_ID: number,
     NOME: string,

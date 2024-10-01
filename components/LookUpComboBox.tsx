@@ -8,7 +8,7 @@ export type FieldResult = {
 };
 
 export type LookUpComboBoxProps = BottomSheetProps & {
-    dataList: { text: string; value: string }[];  
+    dataList: FieldResult[]|null;  
     selectedValue: React.Dispatch<React.SetStateAction<FieldResult>>,
     sheetRef: React.RefObject<BottomSheet>
   }
@@ -21,20 +21,15 @@ export function LookUpComboBox({ dataList, selectedValue, sheetRef } : LookUpCom
     []
   );
 
-  const snapPoints = useMemo(() => ["25%", "50%"
-  ], []);
-
-  const handleSnapPress = useCallback((index: number) => {
-    sheetRef.current?.snapToIndex(index);
-  }, []);
+  const snapPoints = useMemo(() => ["25%", "50%", "90%"], []);
 
   const handleClosePress = useCallback(() => {
     sheetRef.current?.close();
   }, []);
 
-  const selectedItem = (item: string) => {
+  const selectedItem = (item: FieldResult) => {
     selectedValue(item);
-    handleClosePress(); 
+    handleClosePress();
   };
 
   const renderItem = useCallback(
@@ -45,11 +40,12 @@ export function LookUpComboBox({ dataList, selectedValue, sheetRef } : LookUpCom
     ),
     []
   );
-  
+
   return (
       <BottomSheet
         ref={sheetRef}
         snapPoints={snapPoints}
+        style={styles.BottomSheet}
       >
         <BottomSheetFlatList
           data={data}
@@ -62,6 +58,9 @@ export function LookUpComboBox({ dataList, selectedValue, sheetRef } : LookUpCom
 };
 
 const styles = StyleSheet.create({
+  BottomSheet: {
+    zIndex: -1
+  },
   container: {
     flex: 1,
     paddingTop: 200,
