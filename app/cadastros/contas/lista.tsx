@@ -1,4 +1,4 @@
-import { StyleSheet, StatusBar, SafeAreaView, } from 'react-native';
+import { StyleSheet, StatusBar, SafeAreaView, View, ScrollView, FlatList} from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -8,6 +8,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ContaDescrita } from '@/types/conta';
 import { ContaRepository } from '@/repositories/ContaRespoitory';
 import { useAuth } from '@/contexts/AuthContext';
+import { Banco } from '@/types/banco';
 
 export default function ContasScreen() {
   const backgroundHard = useThemeColor({}, 'backgroundHard');
@@ -32,11 +33,11 @@ export default function ContasScreen() {
       .then(() => {
         const contaRepository = new ContaRepository;
         contaRepository
-          .getAllByUser(user?.usuario_id ?? null)
-          .then((bancos) => {
-            if (bancos){
-              setContas(bancos);
-            }            
+          .getAllByUser(user?.USUARIO_ID ?? null)
+          .then((contas) => {
+            if (contas){
+              setContas(contas);
+            }                 
           });
       });
   }, []);
@@ -49,16 +50,23 @@ export default function ContasScreen() {
             barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
             translucent={false}
         /> 
-            
-        
+
+        <FlatList
+          data={contas}
+          renderItem={(conta) => 
+          <View style={{ marginBottom: 15}}>
+            <ThemedText style={{ backgroundColor: primaryColor, padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
+              {conta.item.NOME_CONTA}
+            </ThemedText> 
+            <View style={{backgroundColor: backgroundSoft, padding: 15, borderBottomEndRadius: 5, borderBottomLeftRadius: 5 }}>
+              <ThemedText>Banco: {conta.item.NOME_BANCO}</ThemedText>
+              <ThemedText>Saldo inicial: {conta.item.SALDO_INICIAL?.toString() ?? '0,00'}</ThemedText>
+            </View>
+          </View>}
+        >
+
+        </FlatList>
         <AddDownButton onPress={() => router.push('/cadastros/contas/criar')} />
-
-        {contas.length > 0 ? (
-          contas.map( (contas) => <ThemedText>{contas.NOME_CONTA}</ThemedText> )
-        ) : (
-          <ThemedText style={{textAlign: 'center'}} >Ainda não existem contas cadastradas!</ThemedText>
-        )}
-
     </SafeAreaView>
   
   );
@@ -85,5 +93,8 @@ const styles = StyleSheet.create({
     },
     titleCard: {
       marginTop: 15
+    },
+    cardConta: {
+
     }
 });

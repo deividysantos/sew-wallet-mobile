@@ -1,4 +1,4 @@
-import { StyleSheet, StatusBar, SafeAreaView, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, StatusBar, SafeAreaView, View, TouchableOpacity, Alert } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation, useRouter } from 'expo-router';
 import { useEffect, useRef, useCallback, useState } from 'react';
@@ -29,7 +29,7 @@ export default function ContasScreen() {
   }, [navigation])
 
   const [bancoList, setBancoList] = useState<FieldResult[]|null>(null)
-  const [banco, setBanco] = useState<FieldResult>({ text: '', value: '' });
+  const [banco, setBanco] = useState<FieldResult>({ text: '', value: 0 });
   const [showLookup, setShowLookup] = useState<boolean>(false);
   const sheetRef = useRef<BottomSheet>(null);
   useEffect( () => {
@@ -38,7 +38,7 @@ export default function ContasScreen() {
 
     const getDataListPromise = async () => {
       const dataList = (await (new BancoRepository).getAll())?.map((banco) => {
-        return {text: banco.NOME, value: banco.BANCO_ID.toString() }
+        return {text: banco.NOME, value: banco.BANCO_ID }
       });
 
       if (dataList) {
@@ -56,21 +56,27 @@ export default function ContasScreen() {
   
   const [form, setForm] = useState<Conta>({
       BANCO_ID: 0,
-      USUARIO_ID: user?.usuario_id,
+      USUARIO_ID: user?.USUARIO_ID,
       NOME: '',
       SALDO_INICIAL: 0,
     });
+  
+  useEffect( () => {
+    setForm( (prev) => ({...prev, BANCO_ID: banco.value}) )
+  }, [banco])
 
   const handleCriaConta = async () => {
-    console.log('teste');
-    
-    const conta_id = await (new ContaRepository).createConta(form);
-
-    if (conta_id) {
-      router.back();
+    try {
+      const conta_id = await (new ContaRepository).createConta(form);
+      if (conta_id) {
+        router.back();
+      }
+    } catch (error: any) {
+      Alert.alert('Erro ao cadastrar conta!', error.message)
     }
+    
 
-    console.log(form);
+    
   };
 
   return (
@@ -88,7 +94,6 @@ export default function ContasScreen() {
           <View>
             <ThemedText style={styles.label}>Nome da conta</ThemedText>  
             <ThemedTextInput 
-              placeholder='minha conta' 
               value={ form?.NOME }
               onChangeText={ (newValue => setForm( (formAterior) => ({ ...formAterior, NOME: newValue }) )) }/> 
           </View>
@@ -96,7 +101,6 @@ export default function ContasScreen() {
           <View>
             <ThemedText style={styles.label}>Banco</ThemedText>  
             <ThemedTextInput 
-              placeholder='Selecione' 
               value={ banco.text }
               onPressIn={() => openLoopUp(1)}
               showSoftInputOnFocus={false}
@@ -107,14 +111,16 @@ export default function ContasScreen() {
             <ThemedText style={styles.label}>Valor Inicial</ThemedText>  
             <ThemedTextInput 
               keyboardType = 'numeric'
-              placeholder='Senha' 
               value={ form?.SALDO_INICIAL.toString() }
               onChangeText={ (newValue => setForm( (formAterior) => ({ ...formAterior, SALDO_INICIAL: Number(newValue) }) )) }/> 
           </View>
         </View>
 
         <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-          <TouchableOpacity style={[styles.button, styles.buttonCancel]}>
+          <TouchableOpacity 
+            style={[styles.button, styles.buttonCancel]}
+            onPress={() => router.back()}
+          >
             <ThemedText style={{ color: 'red' }}>
               Cancelar
             </ThemedText>

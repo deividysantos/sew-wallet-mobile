@@ -1,27 +1,30 @@
-import { Conta, ContaDescrita } from "@/types/conta";
+import { Conta, ContaDescrita, ValidateConta } from "@/types/conta";
 import * as SQLite from 'expo-sqlite';
 
 export class ContaRepository {
 
     async createConta (conta : Conta): Promise<number|null>  {
-        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
-        
-        if ((conta.NOME.length < 3) && (conta.NOME.length > 20)){
-            throw Error('Nome de conta de tamanho inválido!');
+
+        const resultaValidate = ValidateConta.safeParse(conta);
+
+        if (!resultaValidate.success) {
+            throw Error(resultaValidate.error.errors[0].message)
         }
+
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
 
         let result = await db.getFirstAsync<{CONTA_ID: number}>('SELECT CONTA_ID FROM CONTA WHERE USUARIO_ID = ? AND NOME = ?', conta.USUARIO_ID, conta.NOME);
 
         if (result?.CONTA_ID) {
             throw Error('Você já possui uma conta com este nome!');
         }
-        console.log('dentro');
+        
         result = null;
         
-        const statement = await db.prepareAsync('INSERT INTO CONTA (BANCO_ID, USUARIO_ID, NOME) VALUES ($banco_id, $usuario_id, $nome)');
+        const statement = await db.prepareAsync('INSERT INTO CONTA (BANCO_ID, USUARIO_ID, NOME, SALDO_INICIAL) VALUES ($banco_id, $usuario_id, $nome, $saldo_inicial)');
 
         try {
-            await statement.executeAsync({$banco_id: conta.BANCO_ID, $usuario_id: conta.USUARIO_ID, $nome: conta.NOME});            
+            await statement.executeAsync({$banco_id: conta.BANCO_ID, $usuario_id: conta.USUARIO_ID, $nome: conta.NOME, $saldo_inicial: conta.SALDO_INICIAL});            
         } finally {
             await statement.finalizeAsync();
         }

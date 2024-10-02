@@ -4,7 +4,7 @@ import BottomSheet, { BottomSheetFlatList, BottomSheetProps } from "@gorhom/bott
 import { ThemedText } from "./ThemedText";
 
 export type FieldResult = {
-    text: string, value: string
+    text: string, value: number
 };
 
 export type LookUpComboBoxProps = BottomSheetProps & {
@@ -49,7 +49,7 @@ export function LookUpComboBox({ dataList, selectedValue, sheetRef } : LookUpCom
       >
         <BottomSheetFlatList
           data={data}
-          keyExtractor={(i) => i.value}
+          keyExtractor={(i) => i.text}
           renderItem={renderItem}
           contentContainerStyle={styles.contentContainer}
         />

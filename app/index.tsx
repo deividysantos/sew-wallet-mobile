@@ -16,7 +16,7 @@ export default function Index() {
   const backgroundHard = useThemeColor({}, 'backgroundHard');
   const { user, login, logout } = useAuth();
 
-  const [ formLogin, setformLogin ] = useState<UsuarioLogin>({email: 'teste@teste.com', senha: 'senha123'});
+  const [ formLogin, setformLogin ] = useState<UsuarioLogin>({email: 'admin@admin.com', senha: 'senha123'});
   const [ verSenha, setVerSenha ] = useState(false);
   const hiddeChar = '*';
   async function handleLogin () {

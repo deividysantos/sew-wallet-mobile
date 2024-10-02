@@ -4,7 +4,6 @@ import * as SQLite from 'expo-sqlite';
 export class UsuarioRepository {
 
     async createUsuario (usuario : Usuario): Promise<string|null>  {
-        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
         const result = ValidateUsuario.safeParse(usuario);
         
         if (!result.success) {
@@ -14,6 +13,8 @@ export class UsuarioRepository {
         if (await this.emailExistente(usuario.email)) {
             throw new Error('Email já está sendo utilizado!');
         }
+
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
         
         const statement = await db.prepareAsync('INSERT INTO USUARIO (NOME, EMAIL, SENHA) VALUES ($nome, $email, $senha)');
         let usuario_id;
