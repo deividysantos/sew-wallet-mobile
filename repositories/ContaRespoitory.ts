@@ -35,6 +35,25 @@ export class ContaRepository {
         return result?.CONTA_ID ?? null;
     }
 
+    async deleteConta(conta_id : number): Promise<boolean>{
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+        
+        const qtdeLctos = await db.getFirstAsync<number>(`SELECT COUNT(L.LANCAMENTO_ID) AS qtdeLctos
+                                                            FROM LANCAMENTO L
+                                                           INNER JOIN CONTA C ON C.CONTA_ID = L.CONTA_ID
+                                                           WHERE C.CONTA_ID = ? `, conta_id);
+        if ((qtdeLctos ?? 0) > 0) {
+            throw new Error('Não é possível apagar a conta, existem lançamentos financeiros ligados a mesma!');
+        }
+
+        try {
+            db.execAsync(`DELETE FROM CONTA WHERE CONTA_ID = ${conta_id}`);
+            return true;
+        } catch (error: any) {
+            throw new Error(error.message);
+        }
+    }
+
     async getAllByUser (usuario_id: number|null): Promise<ContaDescrita[]|null> {
         if (!usuario_id) {
             return null;

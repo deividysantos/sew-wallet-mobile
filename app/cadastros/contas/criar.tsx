@@ -72,11 +72,8 @@ export default function ContasScreen() {
         router.back();
       }
     } catch (error: any) {
-      Alert.alert('Erro ao cadastrar conta!', error.message)
-    }
-    
-
-    
+      Alert.alert('Erro ao cadastrar conta!', error.message, [{text: 'Ok', style: 'cancel'}])
+    }  
   };
 
   return (

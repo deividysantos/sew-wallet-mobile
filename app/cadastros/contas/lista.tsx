@@ -1,4 +1,4 @@
-import { StyleSheet, StatusBar, SafeAreaView, View, ScrollView, FlatList} from 'react-native';
+import { StyleSheet, StatusBar, SafeAreaView, View, FlatList, TouchableOpacity, Alert} from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
@@ -9,6 +9,7 @@ import { ContaDescrita } from '@/types/conta';
 import { ContaRepository } from '@/repositories/ContaRespoitory';
 import { useAuth } from '@/contexts/AuthContext';
 import { Banco } from '@/types/banco';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function ContasScreen() {
   const backgroundHard = useThemeColor({}, 'backgroundHard');
@@ -41,6 +42,24 @@ export default function ContasScreen() {
           });
       });
   }, []);
+
+  async function handleDelete (conta_id : number):Promise<void> {
+    Alert.alert('Atenção!', 'Deseja realmente apagar a conta?', [{text: 'Sim', style: 'default'}, {text: 'Não', style: 'cancel'}])
+    try{
+      await  (new ContaRepository).deleteConta(conta_id);
+      const contaRepository = new ContaRepository;
+        contaRepository
+          .getAllByUser(user?.USUARIO_ID ?? null)
+          .then((contas) => {
+            if (contas){
+              setContas(contas);
+            }                 
+          });
+    } catch (error: any) {
+      Alert.alert('Erro ao apagar a conta!', error.message, [{text: 'Ok', style: 'cancel'}])
+    }
+    
+  }
   
   return (
     
@@ -55,9 +74,13 @@ export default function ContasScreen() {
           data={contas}
           renderItem={(conta) => 
           <View style={{ marginBottom: 15}}>
-            <ThemedText style={{ backgroundColor: primaryColor, padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
-              {conta.item.NOME_CONTA}
-            </ThemedText> 
+            <View style={{ backgroundColor: primaryColor, flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
+              <ThemedText>{conta.item.NOME_CONTA}</ThemedText>
+              <TouchableOpacity onPress={() => handleDelete(conta.item.CONTA_ID)}>
+                <Ionicons size={20} name="trash" style={{color: 'red'}} />
+              </TouchableOpacity>
+              
+            </View> 
             <View style={{backgroundColor: backgroundSoft, padding: 15, borderBottomEndRadius: 5, borderBottomLeftRadius: 5 }}>
               <ThemedText>Banco: {conta.item.NOME_BANCO}</ThemedText>
               <ThemedText>Saldo inicial: {conta.item.SALDO_INICIAL?.toString() ?? '0,00'}</ThemedText>
