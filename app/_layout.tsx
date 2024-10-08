@@ -31,11 +31,8 @@ export default function RootLayout() {
     <GestureHandlerRootView>
       <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
         <AuthProvider>
-          <Stack screenOptions={{animation: 'slide_from_right'}}>
-            <Stack.Screen name="index" options={{ headerShown: false }}/> 
-            <Stack.Screen name="cadastrar" options={{ headerShown: false }}/>
-            <Stack.Screen name="+not-found" />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack screenOptions={{animation: 'slide_from_right', headerShown: false}}>
+            <Stack.Screen name="(tabs)" />
           </Stack>
         </AuthProvider>
       </ThemeProvider>

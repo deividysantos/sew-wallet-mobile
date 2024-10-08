@@ -30,7 +30,7 @@ export default function Index() {
 
         if (dadosUsuario){
           login(dadosUsuario);
-          router.replace('/(tabs)');
+          router.replace('/(tabs)/home');
         }        
       } else {
         Alert.alert('Dados incorretos!', 'Não foi possível entrar com os dados informados, tente novamente.', [{text: 'Tentar Novamente', style: 'cancel'}])

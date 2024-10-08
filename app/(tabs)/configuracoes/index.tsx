@@ -3,6 +3,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StyleSheet, StatusBar, SafeAreaView, View, TouchableOpacity } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 
 import { ThemedText } from '@/components/ThemedText';
 
@@ -13,7 +14,13 @@ export default function ConfiguracoesScreen() {
   const text = useThemeColor({}, 'text');
 
   const router = useRouter();
+  const { user, login, logout } = useAuth();
   
+  function makeLogout() {
+    logout();
+    router.replace('/');
+  }
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: backgroundHard }]}>
         <StatusBar
@@ -21,10 +28,13 @@ export default function ConfiguracoesScreen() {
             barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
             translucent={false}
         /> 
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: 8}}>
+      <TouchableOpacity 
+        style={{flexDirection: 'row', alignItems: 'center', gap: 8}}
+        onPress={() => { makeLogout() }}
+      >
         <Ionicons size={40} name="person-circle-outline" style={{color: primaryColor}} />
         <ThemedText>Deividy Santos</ThemedText>
-      </View>
+      </TouchableOpacity>
 
       <View style={[styles.cardConfig, {backgroundColor: backgroundSoft}]}>
         <ThemedText type='subtitle' style={styles.titleCard}>Configurações</ThemedText>

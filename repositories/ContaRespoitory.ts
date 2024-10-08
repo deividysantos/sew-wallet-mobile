@@ -31,7 +31,7 @@ export class ContaRepository {
 
 
         result = await db.getFirstAsync<{CONTA_ID: number}>('SELECT CONTA_ID FROM CONTA WHERE USUARIO_ID = ? AND NOME = ?', conta.USUARIO_ID, conta.NOME);
-        console.log(conta);
+
         return result?.CONTA_ID ?? null;
     }
 
