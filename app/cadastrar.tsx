@@ -1,6 +1,6 @@
 import { StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, View, Alert } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { Link, router } from 'expo-router';
+import { Link, router, Stack } from 'expo-router';
 import { initDataBase } from '@/database/database';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -8,6 +8,7 @@ import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { useEffect, useState } from 'react';
 import { Usuario } from "@/types/usuario";
 import { UsuarioRepository } from '@/repositories/UsuarioRespository';
+import * as SQLite from 'expo-sqlite';
 
 export default function Index() {
   const backgroundColorButton = useThemeColor({}, 'secondary');
@@ -20,9 +21,13 @@ export default function Index() {
     senha: ''
   });
 
-  useEffect(() => {
-    initDataBase();
-  });
+  async function handleBanco () {
+    const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+    await db.closeAsync();
+    SQLite.deleteDatabaseAsync('sew-wallet.db').then( () => {
+      initDataBase();
+    });
+  }
 
   async function handleCreateUser() {
     try {
@@ -40,49 +45,54 @@ export default function Index() {
   }
 
   return (
-    <SafeAreaView style={{backgroundColor:backgroundColorHard, flex: 1}}>
-      <StatusBar
-          backgroundColor = {backgroundColorHard}
-          barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
-          translucent={false}
-      />
-        
-      <View style={styles.container}>
-        <ThemedText type='title'>Sew Wallet</ThemedText>
-        <View style={{ gap: 16, marginTop: 10 }}>        
-          
-          <ThemedTextInput 
-            style={styles.textInput} 
-            placeholder='Nome' 
-            value={form.nome} 
-            onChangeText={(novoNome => setForm( (formAterior) => ({ ...formAterior, nome: novoNome }) ))} />
+    <>
+      <Stack.Screen options={{ headerShown: false }} /> 
+        <SafeAreaView style={{backgroundColor:backgroundColorHard, flex: 1}}>
+          <StatusBar
+              backgroundColor = {backgroundColorHard}
+              barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
+              translucent={false}
+          />
+            
+          <View style={styles.container}>
+            <TouchableOpacity onPress={() => handleBanco()} >
+              <ThemedText type='title'>Sew Wallet</ThemedText> 
+            </TouchableOpacity>
+            <View style={{ gap: 16, marginTop: 10 }}>        
+              
+              <ThemedTextInput 
+                style={styles.textInput} 
+                placeholder='Nome' 
+                value={form.nome} 
+                onChangeText={(novoNome => setForm( (formAterior) => ({ ...formAterior, nome: novoNome }) ))} />
 
-          <ThemedTextInput 
-            style={styles.textInput} 
-            placeholder='Email' 
-            value={form.email} 
-            onChangeText={(novoEmail => setForm( (formAterior) => ({ ...formAterior, email: novoEmail }) ))}/>
-          
-          <ThemedTextInput 
-            style={styles.textInput} 
-            placeholder='Senha' 
-            value={form.senha} 
-            onChangeText={(novaSenha => setForm( (formAterior) => ({ ...formAterior, senha: novaSenha }) ))}/>
-        </View>
-        
-        <TouchableOpacity 
-          style={[styles.button, { backgroundColor: backgroundColorButton, borderColor: primaryColor }]}
-          onPress={() => handleCreateUser()}
-        >
-          <ThemedText style={{color: primaryColor}}>Cadastrar</ThemedText>
-        </TouchableOpacity>
+              <ThemedTextInput 
+                style={styles.textInput} 
+                placeholder='Email' 
+                value={form.email} 
+                onChangeText={(novoEmail => setForm( (formAterior) => ({ ...formAterior, email: novoEmail }) ))}/>
+              
+              <ThemedTextInput 
+                style={styles.textInput} 
+                placeholder='Senha' 
+                value={form.senha} 
+                onChangeText={(novaSenha => setForm( (formAterior) => ({ ...formAterior, senha: novaSenha }) ))}/>
+            </View>
+            
+            <TouchableOpacity 
+              style={[styles.button, { backgroundColor: backgroundColorButton, borderColor: primaryColor }]}
+              onPress={() => handleCreateUser()}
+            >
+              <ThemedText style={{color: primaryColor}}>Cadastrar</ThemedText>
+            </TouchableOpacity>
 
-        <Link href="/" style={{marginTop: 20, padding: 5}}>
-            <ThemedText style={{color: primaryColor}}>Já tem uma conta?</ThemedText>
-        </Link>
-      </View>
-      
-    </SafeAreaView>
+            <Link href="/" style={{marginTop: 20, padding: 5}}>
+                <ThemedText style={{color: primaryColor}}>Já tem uma conta?</ThemedText>
+            </Link>
+          </View>
+          
+        </SafeAreaView>
+    </>
   );
 }
 

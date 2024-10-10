@@ -12,7 +12,7 @@ export class ContaRepository {
         }
 
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
-
+        
         let result = await db.getFirstAsync<{CONTA_ID: number}>('SELECT CONTA_ID FROM CONTA WHERE USUARIO_ID = ? AND NOME = ?', conta.USUARIO_ID, conta.NOME);
 
         if (result?.CONTA_ID) {
@@ -31,17 +31,17 @@ export class ContaRepository {
 
 
         result = await db.getFirstAsync<{CONTA_ID: number}>('SELECT CONTA_ID FROM CONTA WHERE USUARIO_ID = ? AND NOME = ?', conta.USUARIO_ID, conta.NOME);
-
+                
         return result?.CONTA_ID ?? null;
     }
 
     async deleteConta(conta_id : number): Promise<boolean>{
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
-        
+    
         const qtdeLctos = await db.getFirstAsync<number>(`SELECT COUNT(L.LANCAMENTO_ID) AS qtdeLctos
                                                             FROM LANCAMENTO L
-                                                           INNER JOIN CONTA C ON C.CONTA_ID = L.CONTA_ID
-                                                           WHERE C.CONTA_ID = ? `, conta_id);
+                                                        INNER JOIN CONTA C ON C.CONTA_ID = L.CONTA_ID
+                                                        WHERE C.CONTA_ID = ? `, conta_id);
         if ((qtdeLctos ?? 0) > 0) {
             throw new Error('Não é possível apagar a conta, existem lançamentos financeiros ligados a mesma!');
         }
@@ -60,16 +60,17 @@ export class ContaRepository {
         }
 
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+
         const result = await db.getAllAsync<ContaDescrita>(`
             SELECT C.CONTA_ID,
-                   B.NOME AS NOME_BANCO,
-                   U.NOME AS NOME_USUARIO,
-                   C.NOME AS NOME_CONTA,
-                   C.SALDO_INICIAL
-              FROM CONTA C
-             INNER JOIN BANCO B ON B.BANCO_ID = C.BANCO_ID
-             INNER JOIN USUARIO U ON U.USUARIO_ID = C.USUARIO_ID
-             WHERE U.USUARIO_ID = ?
+                B.NOME AS NOME_BANCO,
+                U.NOME AS NOME_USUARIO,
+                C.NOME AS NOME_CONTA,
+                C.SALDO_INICIAL
+            FROM CONTA C
+            INNER JOIN BANCO B ON B.BANCO_ID = C.BANCO_ID
+            INNER JOIN USUARIO U ON U.USUARIO_ID = C.USUARIO_ID
+            WHERE U.USUARIO_ID = ?
             `, usuario_id
         );
 

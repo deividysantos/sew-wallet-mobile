@@ -1,9 +1,12 @@
 import * as SQLite from 'expo-sqlite';
+import { Seeds } from './seeds';
 
 export const db = SQLite.openDatabaseAsync('sew-wallet.db');
 
 export async function initDataBase (){
     const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+
+    const seed = new Seeds;
 
     try {
         let result = await db.getFirstAsync<{NUMERO: number}>('SELECT NUMERO FROM VERSAO WHERE NUMERO = 1');
@@ -14,9 +17,8 @@ export async function initDataBase (){
     } catch (error) {
         //pode nao ter a tabela versao
     }
-    
 
-    db.withTransactionAsync( async() => {
+    await db.withTransactionAsync( async() => {
 
         await db.execAsync(`
             CREATE TABLE IF NOT EXISTS VERSAO (
@@ -53,6 +55,8 @@ export async function initDataBase (){
             );
         `);
 
+        seed.bancosSeed();
+
         await db.execAsync(`
             CREATE TABLE IF NOT EXISTS CONTA (
                 CONTA_ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -71,10 +75,13 @@ export async function initDataBase (){
                 CATEGORIA_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 USUARIO_ID INTEGER,
                 NOME TEXT NOT NULL,
+                TIPO TEXT,
                 FOREIGN KEY (USUARIO_ID) REFERENCES USUARIO(USUARIO_ID),
-                UNIQUE (NOME, USUARIO_ID)
+                UNIQUE (NOME, USUARIO_ID, TIPO)
             );
         `);
+
+        seed.categoriasSeed(1);        
 
         await db.execAsync(`
             CREATE TABLE IF NOT EXISTS LANCAMENTO (
@@ -104,4 +111,5 @@ export async function initDataBase (){
             INSERT INTO VERSAO (NOME, NUMERO) VALUES ('TESTE', 1);
         `);
     });
+
 }

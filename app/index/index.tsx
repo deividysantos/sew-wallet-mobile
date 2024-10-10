@@ -4,7 +4,7 @@ import { Link, Stack, useRouter } from 'expo-router';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedTextInput } from '@/components/ThemedTextInput';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UsuarioRepository } from '@/repositories/UsuarioRespository';
 import { UsuarioLogin } from '@/types/usuario';
@@ -14,11 +14,9 @@ export default function Index() {
   const backgroundColorButton = useThemeColor({}, 'secondary');
   const primaryColor = useThemeColor({}, 'primary');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
-  const { user, login, logout } = useAuth();
+  const { login } = useAuth();
 
   const [ formLogin, setformLogin ] = useState<UsuarioLogin>({email: 'admin@admin.com', senha: 'senha123'});
-  const [ verSenha, setVerSenha ] = useState(false);
-  const hiddeChar = '*';
   async function handleLogin () {
 
     try {
@@ -42,7 +40,7 @@ export default function Index() {
 
   return (
     <>
-      <Stack.Screen options={{ title: 'Login' }} />    
+      <Stack.Screen options={{ headerShown: false }} />    
       <SafeAreaView style={{backgroundColor:backgroundHard, flex: 1}}>
         <StatusBar
             backgroundColor={backgroundHard}

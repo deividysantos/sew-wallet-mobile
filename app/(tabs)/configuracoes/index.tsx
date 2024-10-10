@@ -14,7 +14,7 @@ export default function ConfiguracoesScreen() {
   const text = useThemeColor({}, 'text');
 
   const router = useRouter();
-  const { user, login, logout } = useAuth();
+  const { logout } = useAuth();
   
   function makeLogout() {
     logout();
@@ -50,7 +50,7 @@ export default function ConfiguracoesScreen() {
         <ThemedText type='subtitle' style={styles.titleCard}>Cadastros</ThemedText>
         <View style={{borderBottomColor: text, borderBottomWidth: StyleSheet.hairlineWidth}}/>
           <View style={{gap: 10}}>
-            <TouchableOpacity style={styles.option} onPress={() => router.push('/cadastros/categorias')}>
+            <TouchableOpacity style={styles.option} onPress={() => router.push('/cadastros/categorias/lista')}>
               <Ionicons size={20} name="albums-outline" style={{color: primaryColor}} />
               <ThemedText>Categorías</ThemedText>
             </TouchableOpacity>
