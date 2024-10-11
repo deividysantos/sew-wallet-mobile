@@ -1,13 +1,14 @@
 import { StyleSheet, StatusBar, SafeAreaView, View, FlatList, TouchableOpacity, Alert} from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback  } from 'react';
 import { AddDownButton } from '@/components/AddDownButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ContaDescrita } from '@/types/conta';
 import { ContaRepository } from '@/repositories/ContaRespoitory';
 import { useAuth } from '@/contexts/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ContasScreen() {
   const backgroundHard = useThemeColor({}, 'backgroundHard');
@@ -25,7 +26,7 @@ export default function ContasScreen() {
     navigation.setOptions({ title: 'Contas', headerTintColor: text, headerStyle: { backgroundColor: backgroundSoft } })
   }, [navigation])
 
-  useEffect(() => {
+  const atualizaDados = () => {
     const contaRepository = new ContaRepository;
     contaRepository
       .getAllByUser(user?.USUARIO_ID ?? null)
@@ -34,8 +35,17 @@ export default function ContasScreen() {
           setContas(contas);
         }                 
       });
-  
+  }
+
+  useEffect(() => {
+    atualizaDados();  
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      atualizaDados();
+    }, [])
+  );
 
   async function handleDelete (conta_id : number):Promise<void> {
     Alert.alert('Atenção!', 'Deseja realmente apagar a conta?', [{text: 'Sim', style: 'default'}, {text: 'Não', style: 'cancel'}])

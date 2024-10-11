@@ -60,7 +60,7 @@ export default function ConfiguracoesScreen() {
               <ThemedText>Contas</ThemedText>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.option} onPress={() => router.push('/cadastros/cartoes')}>
+            <TouchableOpacity style={styles.option} onPress={() => router.push('/cadastros/cartoes/lista')}>
               <Ionicons size={20} name="card-outline" style={{color: primaryColor}} />
               <ThemedText>Cartões</ThemedText>
             </TouchableOpacity>

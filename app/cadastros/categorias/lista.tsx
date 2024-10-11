@@ -2,7 +2,6 @@ import { StyleSheet, StatusBar, SafeAreaView, View, FlatList, TouchableOpacity, 
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Seeds } from '@/database/seeds';
 import { AddDownButton } from '@/components/AddDownButton';
 import { ThemedText } from '@/components/ThemedText';
 import { CategoriaRepository } from '@/repositories/CategoriaRepository';
@@ -27,22 +26,13 @@ export default function CategoriasScreen() {
   }, [navigation])
 
   useEffect(() => {
-    const seed = new Seeds;
-    seed
-      .bancosSeed()
-      .then(() => {
-        
-        if (user?.USUARIO_ID) {
-          const categoriaRepository = new CategoriaRepository;
-          
-          categoriaRepository
-            .getAll(user.USUARIO_ID)
-            .then((categorias) => {
-              if (categorias){
-        
-                setCategorias(categorias);
-              }                 
-            });
+    const categoriaRepository = new CategoriaRepository;
+
+    categoriaRepository
+      .getAll(user.USUARIO_ID)
+      .then((categorias) => {
+        if (categorias){
+          setCategorias(categorias);
         }
       });
   }, []);
@@ -62,17 +52,13 @@ export default function CategoriasScreen() {
           renderItem={(conta) => 
           <View style={{ marginBottom: 15}}>
             <View style={{ backgroundColor: primaryColor, flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
-              <ThemedText>{conta.item.CATEGORIA_NOME}</ThemedText>
-              <TouchableOpacity>
-                <Ionicons size={20} name="trash" style={{color: 'red'}} />
-              </TouchableOpacity>
-              
+              <ThemedText>{conta.item.CATEGORIA_NOME}</ThemedText>              
             </View> 
           </View>}
         >
 
         </FlatList>
-        <AddDownButton onPress={() => router.push('/cadastros/contas/criar')} />
+        <AddDownButton onPress={() => router.push('/cadastros/categorias/criar')} />
     </SafeAreaView>
   
   );
