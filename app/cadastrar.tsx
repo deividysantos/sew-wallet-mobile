@@ -5,7 +5,9 @@ import { initDataBase } from '@/database/database';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedTextInput } from '@/components/ThemedTextInput';
-import { useEffect, useState } from 'react';
+import { ThemedButton } from '@/components/ThemedButton';
+
+import { useState } from 'react';
 import { Usuario } from "@/types/usuario";
 import { UsuarioRepository } from '@/repositories/UsuarioRespository';
 import * as SQLite from 'expo-sqlite';
@@ -78,13 +80,11 @@ export default function Index() {
                 value={form.senha} 
                 onChangeText={(novaSenha => setForm( (formAterior) => ({ ...formAterior, senha: novaSenha }) ))}/>
             </View>
-            
-            <TouchableOpacity 
-              style={[styles.button, { backgroundColor: backgroundColorButton, borderColor: primaryColor }]}
+
+            <ThemedButton 
+              text='Cadastrar'
               onPress={() => handleCreateUser()}
-            >
-              <ThemedText style={{color: primaryColor}}>Cadastrar</ThemedText>
-            </TouchableOpacity>
+            />
 
             <Link href="/" style={{marginTop: 20, padding: 5}}>
                 <ThemedText style={{color: primaryColor}}>Já tem uma conta?</ThemedText>

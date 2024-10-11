@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { UsuarioRepository } from '@/repositories/UsuarioRespository';
 import { UsuarioLogin } from '@/types/usuario';
+import { ThemedButton } from '@/components/ThemedButton';
 
 export default function Index() {
   const router = useRouter();
@@ -63,12 +64,11 @@ export default function Index() {
               value={ formLogin.senha }
               onChangeText={novaSenha => setformLogin({email: formLogin.email, senha: novaSenha})}/>
           </View>
-          
-          <TouchableOpacity 
-            style={[styles.button, { backgroundColor: backgroundColorButton, borderColor: primaryColor }]}
-            onPress={ handleLogin }>
-            <ThemedText style={{color: primaryColor}}>Entrar</ThemedText>
-          </TouchableOpacity>
+
+          <ThemedButton 
+            text='Entrar'
+            onPress={ handleLogin }
+          />
 
           <Link href="/cadastrar" style={{marginTop: 20, padding: 5}}>
             <ThemedText style={{color: primaryColor}}>Deseja criar uma conta?</ThemedText>
