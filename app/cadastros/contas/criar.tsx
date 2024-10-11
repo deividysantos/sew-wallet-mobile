@@ -11,6 +11,8 @@ import { ContaRepository } from '@/repositories/ContaRespoitory';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { LookUpComboBox, FieldResult } from '@/components/LookUpComboBox';
+import { ThemedButton } from '@/components/ThemedButton';
+
 import { Conta } from '@/types/conta';
 
 export default function ContasScreen() {
@@ -114,23 +116,17 @@ export default function ContasScreen() {
         </View>
 
         <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-          <TouchableOpacity 
-            style={[styles.button, styles.buttonCancel]}
+          <ThemedButton
+            type='cancel'
+            text='Cancelar'
             onPress={() => router.back()}
-          >
-            <ThemedText style={{ color: 'red' }}>
-              Cancelar
-            </ThemedText>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={[styles.button, styles.buttonConfirm, { backgroundColor: secondaryColor, borderColor: primaryColor }]}
+          />
+          
+          <ThemedButton
+            type='default'
+            text='Cadastrar'
             onPress={() => handleCriaConta()}
-          >
-            <ThemedText style={{color: primaryColor}}>
-              Cadastrar
-            </ThemedText>
-          </TouchableOpacity>
+          />
         </View>
       </View>
 
@@ -158,8 +154,6 @@ const styles = StyleSheet.create({
       paddingVertical: 10,
       borderRadius: 8,
       borderWidth: 1
-    },
-    buttonConfirm: {      
     },
     buttonCancel:{
       borderColor: 'red',      

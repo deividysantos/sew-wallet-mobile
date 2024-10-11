@@ -83,6 +83,7 @@ export default function Index() {
 
             <ThemedButton 
               text='Cadastrar'
+              type='primary'
               onPress={() => handleCreateUser()}
             />
 

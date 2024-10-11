@@ -67,6 +67,7 @@ export default function Index() {
 
           <ThemedButton 
             text='Entrar'
+            type='primary'
             onPress={ handleLogin }
           />
 
