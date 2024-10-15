@@ -1,12 +1,12 @@
-import { Slot, Tabs } from 'expo-router';
+import { Slot, Stack, Tabs } from 'expo-router';
 
 export default function TabLayout() {
   
   return (
   
-   <Slot>
+   <Stack screenOptions={ {animation: 'flip'} }>
 
-   </Slot>
+   </Stack>
   
   );
 }

@@ -8,7 +8,7 @@ import { AddDownButton } from '@/components/AddDownButton';
 
 import { useNavigation, useRouter, Stack } from 'expo-router';
 
-export default function LancamentosScreen() {
+export default function LancamentosCreateScreen() {
   const router = useRouter();
 
   const text = useThemeColor({}, 'text');
@@ -17,12 +17,12 @@ export default function LancamentosScreen() {
 
   const navigation = useNavigation();
   useEffect(() => {
-    navigation.setOptions({ title: 'Lançamentos', headerTintColor: text, headerStyle: { backgroundColor: backgroundSoft } })
+    navigation.setOptions({ title: 'Cadastrar Lançamentos', headerTintColor: text, headerStyle: { backgroundColor: backgroundSoft } })
   }, [navigation])
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }}/>
+      <Stack.Screen/>
       <SafeAreaView style={[styles.container, { backgroundColor: backgroundHard }]}>
         <StatusBar
               backgroundColor={backgroundHard}
@@ -30,7 +30,8 @@ export default function LancamentosScreen() {
               translucent={false}
           />
 
-      <AddDownButton onPress={() => router.push('/(tabs)/lancamentos/criar')} />
+        <ThemedText>Teste</ThemedText>
+      
       </SafeAreaView>
     </>
   );
