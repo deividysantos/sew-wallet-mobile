@@ -1,4 +1,4 @@
-import { StyleSheet, StatusBar, SafeAreaView, View, TouchableOpacity, Alert } from 'react-native';
+import { StyleSheet, StatusBar, SafeAreaView, View, Alert, Keyboard } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation, useRouter } from 'expo-router';
 import { useEffect, useRef, useCallback, useState } from 'react';
@@ -51,7 +51,7 @@ export default function ContasScreen() {
     getDataListPromise();
   }, [bancoList]);
     
-  const openLoopUp = useCallback((index: number) => {
+  const openLookUp = useCallback((index: number) => {
     setShowLookup(true);
     sheetRef.current?.expand();
   }, []); 
@@ -94,6 +94,7 @@ export default function ContasScreen() {
             <ThemedText style={styles.label}>Nome da conta</ThemedText>  
             <ThemedTextInput 
               value={ form?.NOME }
+              onPress={ () => {setShowLookup(false)} }
               onChangeText={ (newValue => setForm( (formAterior) => ({ ...formAterior, NOME: newValue }) )) }/> 
           </View>
 
@@ -101,9 +102,12 @@ export default function ContasScreen() {
             <ThemedText style={styles.label}>Banco</ThemedText>  
             <ThemedTextInput 
               value={ banco.text }
-              onPressIn={() => openLoopUp(1)}
+              onPress={ () => {
+                Keyboard.dismiss();
+                openLookUp(1);
+              }} 
               showSoftInputOnFocus={false}
-              onChangeText={() => {}}/> 
+            /> 
           </View>
 
           <View>
@@ -111,6 +115,7 @@ export default function ContasScreen() {
             <ThemedTextInput 
               keyboardType = 'numeric'
               value={ form?.SALDO_INICIAL.toString() }
+              onPress={ () => {setShowLookup(false)} }
               onChangeText={ (newValue => setForm( (formAterior) => ({ ...formAterior, SALDO_INICIAL: Number(newValue) }) )) }/> 
           </View>
         </View>

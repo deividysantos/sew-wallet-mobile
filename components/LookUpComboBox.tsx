@@ -35,7 +35,7 @@ export function LookUpComboBox({ dataList, selectedValue, sheetRef } : LookUpCom
   const renderItem = useCallback(
     ( item ) => (            
       <TouchableOpacity style={styles.itemContainer} onPress={() => selectedItem({text: item.item.text, value: item.item.value})}>
-        <ThemedText style={{color: 'red'}}>{item.item.text}</ThemedText>
+        <ThemedText style={{color: 'black'}}>{item.item.text}</ThemedText>
       </TouchableOpacity>
     ),
     []
@@ -71,6 +71,6 @@ const styles = StyleSheet.create({
   itemContainer: {
     padding: 6,
     margin: 6,
-    backgroundColor: "#eee",
+    
   },
 });

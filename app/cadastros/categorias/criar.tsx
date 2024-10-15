@@ -69,30 +69,30 @@ export default function CategoriasScreen() {
            
             <View style={{flexDirection: 'row', gap: 50}}>
                 
-                <View style={{flexDirection: 'row',  alignItems: 'center', gap: 10}}>
-                    <TouchableOpacity 
-                      style={[styles.radioButton, {backgroundColor: backgroundSoft}, form.TIPO == 'D' ? { backgroundColor: primaryColor} : {} ]}
-                      onPress={() => setForm( (formAnteiror) => ({...formAnteiror, TIPO: 'D'}) )} 
-                    >
-                        
-                    </TouchableOpacity>
-                    <ThemedText>
-                        Despesa
-                    </ThemedText>
-                </View>
 
-                <View style={{flexDirection: 'row',  alignItems: 'center', gap: 10}}>
-                    <TouchableOpacity 
-                      style={[styles.radioButton, {backgroundColor: backgroundSoft}, form.TIPO == 'R' ? { backgroundColor: primaryColor} : {}]}
-                      onPress={() => setForm( (formAnteiror) => ({...formAnteiror, TIPO: 'R'}) )}
-                    >
-                        
-                    </TouchableOpacity>
-                    <ThemedText>
-                        Receita
-                    </ThemedText>
-                </View>
+                <TouchableOpacity 
+                  style={{flexDirection: 'row',  alignItems: 'center', gap: 10}}
+                  onPress={() => setForm( (formAnteiror) => ({...formAnteiror, TIPO: 'D'}) )} 
+                >
+                  <View style={[styles.radioButton, {backgroundColor: backgroundSoft}, form.TIPO == 'D' ? { backgroundColor: primaryColor} : {} ]}>
 
+                  </View>
+                  <ThemedText>
+                      Despesa
+                  </ThemedText>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={{flexDirection: 'row',  alignItems: 'center', gap: 10}}
+                  onPress={() => setForm( (formAnteiror) => ({...formAnteiror, TIPO: 'R'}) )}
+                >
+                  <View style={[styles.radioButton, {backgroundColor: backgroundSoft}, form.TIPO == 'R' ? { backgroundColor: primaryColor} : {}]}>
+
+                  </View>
+                  <ThemedText>
+                      Receita
+                  </ThemedText>    
+                </TouchableOpacity>                          
             </View>
           </View>
         </View>
