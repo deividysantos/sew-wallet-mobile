@@ -8,12 +8,13 @@ export type FieldResult = {
 };
 
 export type LookUpComboBoxProps = BottomSheetProps & {
+    title?: string,
     dataList: FieldResult[]|null;  
-    selectedValue: React.Dispatch<React.SetStateAction<FieldResult>>,
+    selectedValue: (e : FieldResult) => void,
     sheetRef: React.RefObject<BottomSheet>
   }
 
-export function LookUpComboBox({ dataList, selectedValue, sheetRef } : LookUpComboBoxProps ) {  
+export function LookUpComboBox({ title, dataList, selectedValue, sheetRef } : LookUpComboBoxProps ) {  
   
   const data = useMemo(
     () =>
@@ -45,8 +46,11 @@ export function LookUpComboBox({ dataList, selectedValue, sheetRef } : LookUpCom
       <BottomSheet
         ref={sheetRef}
         snapPoints={snapPoints}
-        style={styles.BottomSheet}
       >
+        {title && 
+          <ThemedText style={{marginHorizontal: 10}} type="subtitle">{title}</ThemedText>
+        }
+        
         <BottomSheetFlatList
           data={data}
           keyExtractor={(i) => i.text}
@@ -58,9 +62,6 @@ export function LookUpComboBox({ dataList, selectedValue, sheetRef } : LookUpCom
 };
 
 const styles = StyleSheet.create({
-  BottomSheet: {
-    zIndex: -1
-  },
   container: {
     flex: 1,
     paddingTop: 200,
