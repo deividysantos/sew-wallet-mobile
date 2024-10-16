@@ -1,15 +1,19 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useState } from 'react';
-import { StyleSheet, StatusBar, SafeAreaView, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Modal } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { AddDownButton } from '@/components/AddDownButton';
 
-import { useRouter, Stack } from 'expo-router';
+import { useRouter } from 'expo-router';
 
-export default function LancamentosCreateScreen() {
+export type LancamentosCreateModal = {
+  visible: boolean,
+  setVisible: (e:boolean) => void
+}
+
+export default function LancamentosCreateModal( { visible, setVisible } : LancamentosCreateModal ) {
   const router = useRouter();
 
   const text = useThemeColor({}, 'text');
@@ -19,20 +23,29 @@ export default function LancamentosCreateScreen() {
   const [tipoLancamento, setTipoLancamento] = useState('');
 
   return (
-    <>
-      <SafeAreaView style={[styles.container, { backgroundColor: backgroundHard }]}>
-        <StatusBar
-          backgroundColor={backgroundHard}
-          barStyle={useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
-          translucent={false}
-        />
+    <Modal
+      animationType='slide'
+      transparent={true}
+      visible={visible}
+    >
+      <TouchableOpacity
+        activeOpacity={1}
+        style={[styles.container]}
+        onPress={ 
+          () => { 
+            setVisible(false); 
+            setTipoLancamento('') 
+          }
+        }
+      >
+
         {tipoLancamento === '' &&
-          <>
-            <ThemedText>
-              Selecione o tipo de lançamentos
+          <TouchableOpacity  style={[styles.options, {backgroundColor: backgroundSoft}]} activeOpacity={1} >
+            <ThemedText type='subtitle'>
+              Selecione o tipo do lançamento
             </ThemedText>
 
-            <View style={{ flexDirection: 'row', gap: 50, padding: 25 }}>
+            <View style={{ flexDirection: 'row', gap: 50 }}>
               <TouchableOpacity
                 onPress={() => { setTipoLancamento('C') }}
                 style={styles.btnTipoLancamento}
@@ -53,7 +66,7 @@ export default function LancamentosCreateScreen() {
                 </ThemedText>
               </TouchableOpacity>
             </View>
-          </>
+          </TouchableOpacity>
         }
 
         {tipoLancamento === 'C' && <>
@@ -67,22 +80,33 @@ export default function LancamentosCreateScreen() {
               agora vai
             </ThemedText>
         </>}
-      </SafeAreaView>
-    </>
+      </TouchableOpacity>
+    </Modal>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center'
+    
+    flex: 1
   },
+
+  options: {
+    marginTop: 'auto',
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 30,
+    padding: 20,
+    marginHorizontal: 15
+  },
+
+  
   btnTipoLancamento: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: 'white',
     padding: 20,
     width: 100,

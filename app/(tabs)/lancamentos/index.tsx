@@ -1,10 +1,11 @@
-import { useEffect } from 'react';
-import { StyleSheet, StatusBar, SafeAreaView } from 'react-native';
+import { useEffect, useState } from 'react';
+import { StyleSheet, StatusBar, SafeAreaView, Modal, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { AddDownButton } from '@/components/AddDownButton';
+import  LancamentosCreateModal  from '@/app/(tabs)/lancamentos/criar'
 
 import { useNavigation, useRouter, Stack } from 'expo-router';
 
@@ -20,6 +21,8 @@ export default function LancamentosScreen() {
     navigation.setOptions({ title: 'Lançamentos', headerTintColor: text, headerStyle: { backgroundColor: backgroundSoft } })
   }, [navigation])
 
+  const [modal, setModal] = useState(false);
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }}/>
@@ -30,7 +33,9 @@ export default function LancamentosScreen() {
               translucent={false}
           />
 
-      <AddDownButton onPress={() => router.push('/(tabs)/lancamentos/criar')} />
+        <AddDownButton onPress={() => { setModal(true) } }/>
+
+        <LancamentosCreateModal  visible={modal} setVisible={setModal}/>
       </SafeAreaView>
     </>
   );
