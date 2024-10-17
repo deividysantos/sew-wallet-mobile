@@ -51,7 +51,7 @@ export default function ContasScreen() {
     getDataListPromise();
   }, [bancoList]);
     
-  const openLookUp = useCallback((index: number) => {
+  const openLookUp = useCallback(() => {
     setShowLookup(true);
     sheetRef.current?.expand();
   }, []); 
@@ -104,7 +104,7 @@ export default function ContasScreen() {
               value={ banco.text }
               onPress={ () => {
                 Keyboard.dismiss();
-                openLookUp(1);
+                openLookUp();
               }} 
               showSoftInputOnFocus={false}
             /> 

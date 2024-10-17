@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity, Modal, Keyboard, text } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Modal, Keyboard } from 'react-native';
 import { useRouter } from 'expo-router';
 import BottomSheet from "@gorhom/bottom-sheet";
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -72,7 +72,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
     CarregaContas();
   }, [tipoLancamento]);
 
-  const openLookUpContas = useCallback((index: number) => {
+  const openLookUpContas = useCallback(() => {
     setExibeLookUpContas(true);
     sheetRef.current?.expand();
   }, []);
@@ -160,13 +160,13 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
               />              
 
               <View style={{flexDirection: 'row', gap: 10, marginBottom: 7}}>
-                <View style={{flex: 1}}>
+                <View style={{flex: 2}}>
                   <ThemedText> Conta </ThemedText>
                   <ThemedTextInput 
                     value={ contaSelecionada?.text }
                     onPress={ () => {
                       Keyboard.dismiss();
-                      openLookUpContas(1);
+                      openLookUpContas();
                     }} 
                     showSoftInputOnFocus={false}
                   />
@@ -175,9 +175,12 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
 
                 <View style={{flex: 1}}>
                   <ThemedText> Data </ThemedText>
-                  <ThemedTextInput 
+                  <ThemedTextInput
                     value={formulario.DATA.toLocaleDateString()}
-                    onPress={() => { setExibeDatePicker(true) } }
+                    onPress={ () => {
+                      setExibeDatePicker(true);
+                    }}
+                    showSoftInputOnFocus={false}
                   />
                 </View>
               </View>           
