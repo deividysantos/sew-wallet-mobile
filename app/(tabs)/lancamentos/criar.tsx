@@ -3,18 +3,19 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, Modal, Keyboard, text } from 'react-native';
 import { useRouter } from 'expo-router';
 import BottomSheet from "@gorhom/bottom-sheet";
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { useAuth } from '@/contexts/AuthContext';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedTextInput } from '@/components/ThemedTextInput';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { FieldResult, LookUpComboBox } from '@/components/LookUpComboBox';
+import { ThemedButton } from '@/components/ThemedButton';
 
 import { ContaDescrita } from '@/types/conta';
-
-import { useAuth } from '@/contexts/AuthContext';
+import { Lancamento } from '@/types/lancamentos';
 import { ContaRepository } from '@/repositories/ContaRespoitory';
-import { ThemedButton } from '@/components/ThemedButton';
 
 export type LancamentosCreateModal = {
   visible: boolean,
@@ -27,6 +28,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
     setTipoLancamento('');
     setExibeLookUpContas(false);
     setContaSelecionada(null);
+    setFomulario({ CATEGORIA_ID: 0, CONTA_ID: 0, DESCRICAO: '', LANCAMENTO_ID: 0, TITULO: '', VALOR: 0, DATA: new Date});
   }
 
   const router = useRouter();
@@ -38,6 +40,8 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
   const backgroundHard = useThemeColor({}, 'backgroundHard');
 
   const [tipoLancamento, setTipoLancamento] = useState('');
+
+  const [ formulario, setFomulario ] = useState<Lancamento>({ CATEGORIA_ID: 0, CONTA_ID: 0, DESCRICAO: '', LANCAMENTO_ID: 0, TITULO: '', VALOR: 0, DATA: new Date});
 
   const [contas, setContas] = useState<FieldResult[]|null>(null);
   const [contaSelecionada, setContaSelecionada] = useState<FieldResult|null>(null);
@@ -73,6 +77,18 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
     sheetRef.current?.expand();
   }, []);
 
+  const [exibeDatePicker, setExibeDatePicker] = useState(false);
+
+  const selecionaData = (event: DateTimePickerEvent, date?: Date | undefined) => {
+    setExibeDatePicker(false);
+
+    if (!date) {
+      return;
+    }
+
+    setFomulario( (prev) => ({...prev, DATA: date}) );
+  };
+  
   return (
     <Modal
       animationType='slide'
@@ -129,12 +145,18 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
               </View>
 
               <ThemedText> Título </ThemedText>
-              <ThemedTextInput style={{marginBottom: 7}} ></ThemedTextInput>
+              <ThemedTextInput 
+                style={{marginBottom: 7}} 
+                value={formulario.TITULO}
+                onChangeText={ (novoTitulo => setFomulario( (prev) => ({...prev, TITULO: novoTitulo}) ) ) }
+              />
 
               <ThemedText >Valor</ThemedText>  
               <ThemedTextInput 
                 keyboardType = 'numeric'
                 style={{marginBottom: 7}}
+                value={formulario.VALOR.toString()}
+                onChangeText={ (novoValor => setFomulario( (prev) => ({...prev, VALOR: Number(novoValor)}) )) }
               />              
 
               <View style={{flexDirection: 'row', gap: 10, marginBottom: 7}}>
@@ -153,12 +175,20 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
 
                 <View style={{flex: 1}}>
                   <ThemedText> Data </ThemedText>
-                  <ThemedTextInput/>
+                  <ThemedTextInput 
+                    value={formulario.DATA.toLocaleDateString()}
+                    onPress={() => { setExibeDatePicker(true) } }
+                  />
                 </View>
               </View>           
 
               <ThemedText> Descrição </ThemedText>
-              <ThemedTextInput style={{marginBottom: 7, height: 100}} multiline></ThemedTextInput>
+              <ThemedTextInput 
+                value={formulario.DESCRICAO.toString()}
+                onChangeText={ (novaDesc => setFomulario( (prev) => ({...prev, DESCRICAO: novaDesc}) )) }
+                style={{marginBottom: 7, height: 100}} 
+                multiline
+              />
 
               <ThemedButton 
                 style={{alignItems: 'center', marginTop: 10}} 
@@ -175,6 +205,15 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
                 title='Contas'
               /> 
             }
+
+            {exibeDatePicker && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={formulario.DATA}
+                mode='date'
+                onChange={selecionaData}
+              />
+            )}            
 
             </TouchableOpacity>
         </>}
