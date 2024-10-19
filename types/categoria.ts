@@ -8,6 +8,7 @@ export type Categoria = {
 }
 
 export type CategoriaDescrita = {
+    CATEGORIA_ID: number,
     USUARIO_NOME: string,
     CATEGORIA_NOME: string,
     TIPO: string

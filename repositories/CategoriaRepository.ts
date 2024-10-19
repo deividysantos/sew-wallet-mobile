@@ -7,7 +7,8 @@ export class CategoriaRepository {
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
 
         const result = await db.getAllAsync<CategoriaDescrita>(`
-            SELECT U.NOME AS USUARIO_NOME,
+            SELECT C.CATEGORIA_ID,
+                   U.NOME AS USUARIO_NOME,
                    C.NOME AS CATEGORIA_NOME,
                    C.TIPO
               FROM CATEGORIA C

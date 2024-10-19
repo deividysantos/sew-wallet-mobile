@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity, Modal, Keyboard } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Modal, Keyboard, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import BottomSheet from "@gorhom/bottom-sheet";
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -13,9 +13,10 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { FieldResult, LookUpComboBox } from '@/components/LookUpComboBox';
 import { ThemedButton } from '@/components/ThemedButton';
 
-import { ContaDescrita } from '@/types/conta';
 import { Lancamento } from '@/types/lancamentos';
 import { ContaRepository } from '@/repositories/ContaRespoitory';
+import { LancamentoRepository } from '@/repositories/LancamentoRepository';
+import { CategoriaRepository } from '@/repositories/CategoriaRepository';
 
 export type LancamentosCreateModal = {
   visible: boolean,
@@ -29,20 +30,30 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
     setExibeLookUpContas(false);
     setContaSelecionada(null);
     setFomulario({ CATEGORIA_ID: 0, CONTA_ID: 0, DESCRICAO: '', LANCAMENTO_ID: 0, TITULO: '', VALOR: 0, DATA: new Date});
+    setExibeLookUpCategorias(false);
+    setCategoriaSelecionada(null);
   }
 
   const router = useRouter();
   const { user } = useAuth();
-  const sheetRef = useRef<BottomSheet>(null);
 
   const text = useThemeColor({}, 'text');
   const backgroundSoft = useThemeColor({}, 'backgroundSoft');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
 
   const [tipoLancamento, setTipoLancamento] = useState('');
+  useEffect(() => {
+    if (tipoLancamento === ''){
+      return;
+    }      
+
+    CarregaContas();
+    CarregaCategorias();
+  }, [tipoLancamento]);
 
   const [ formulario, setFomulario ] = useState<Lancamento>({ CATEGORIA_ID: 0, CONTA_ID: 0, DESCRICAO: '', LANCAMENTO_ID: 0, TITULO: '', VALOR: 0, DATA: new Date});
 
+  const sheetRefConta = useRef<BottomSheet>(null);
   const [contas, setContas] = useState<FieldResult[]|null>(null);
   const [contaSelecionada, setContaSelecionada] = useState<FieldResult|null>(null);
   const [exibeLookUpContas, setExibeLookUpContas] = useState(false);
@@ -64,17 +75,48 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
     setContas(contasFiled);
   }
 
-  useEffect(() => {
-    if (tipoLancamento === ''){
-      return;
-    }      
-
-    CarregaContas();
-  }, [tipoLancamento]);
+  useEffect(()=>{
+    if (contaSelecionada?.value){
+      setFomulario( (prev) => ({...prev, CONTA_ID: contaSelecionada.value}) )
+    }
+  }, [contaSelecionada]);
 
   const openLookUpContas = useCallback(() => {
     setExibeLookUpContas(true);
-    sheetRef.current?.expand();
+    sheetRefConta.current?.expand();
+  }, []);
+
+  const sheetRefCategoria = useRef<BottomSheet>(null);
+  const [categorias, setCategorias] = useState<FieldResult[]|null>(null);
+  const [categoriaSelecionada, setCategoriaSelecionada] = useState<FieldResult|null>(null);
+  const [exibeLookUpCategorias, setExibeLookUpCategorias] = useState(false);
+  
+  async function CarregaCategorias (){
+    const categoriaRepository = new CategoriaRepository;
+
+    const categoriasResult = await categoriaRepository.getAll(user.USUARIO_ID);
+
+    if (!categoriasResult) {
+      setCategorias(null);
+      return
+    }
+
+    const categoriasFiled = categoriasResult.map( (categoria) => {
+      return { text: categoria.CATEGORIA_NOME, value: categoria.CATEGORIA_ID }
+    });
+
+    setCategorias(categoriasFiled);
+  }
+
+  useEffect(()=>{
+    if (categoriaSelecionada?.value){
+      setFomulario( (prev) => ({...prev, CATEGORIA_ID: categoriaSelecionada.value}) )
+    }
+  }, [categoriaSelecionada]);
+
+  const openLookUpCategorias = useCallback(() => {
+    setExibeLookUpCategorias(true);
+    sheetRefCategoria.current?.expand();
   }, []);
 
   const [exibeDatePicker, setExibeDatePicker] = useState(false);
@@ -88,6 +130,19 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
 
     setFomulario( (prev) => ({...prev, DATA: date}) );
   };
+
+  async function handleCadastrar(){
+    const lancamentoRepository = new LancamentoRepository;
+
+    try {
+      await lancamentoRepository.createLancamento(formulario);
+    } catch (e: any) {
+      Alert.alert('Erro ao gravar lançamento!', e.message);
+      return;
+    }
+    
+    Close();
+  }
   
   return (
     <Modal
@@ -151,13 +206,29 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
                 onChangeText={ (novoTitulo => setFomulario( (prev) => ({...prev, TITULO: novoTitulo}) ) ) }
               />
 
-              <ThemedText >Valor</ThemedText>  
-              <ThemedTextInput 
-                keyboardType = 'numeric'
-                style={{marginBottom: 7}}
-                value={formulario.VALOR.toString()}
-                onChangeText={ (novoValor => setFomulario( (prev) => ({...prev, VALOR: Number(novoValor)}) )) }
-              />              
+              <View style={{flexDirection: 'row', gap: 10, marginBottom: 7}}>
+                <View style={{flex: 1}}>
+                  <ThemedText >Valor</ThemedText>  
+                  <ThemedTextInput 
+                    keyboardType = 'numeric'
+                    style={{marginBottom: 7}}
+                    value={formulario.VALOR.toString()}
+                    onChangeText={ (novoValor => setFomulario( (prev) => ({...prev, VALOR: Number(novoValor)}) )) }
+                  />
+                </View>
+
+                <View style={{flex: 2}}>
+                  <ThemedText> Categoria </ThemedText>
+                  <ThemedTextInput 
+                    value={ categoriaSelecionada?.text }
+                    onPress={ () => {
+                      Keyboard.dismiss();
+                      openLookUpCategorias();
+                    }} 
+                    showSoftInputOnFocus={false}
+                  />
+                </View>
+              </View>          
 
               <View style={{flexDirection: 'row', gap: 10, marginBottom: 7}}>
                 <View style={{flex: 2}}>
@@ -196,18 +267,28 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
               <ThemedButton 
                 style={{alignItems: 'center', marginTop: 10}} 
                 text='Cadastrar' 
-                onPress={Close}
+                onPress={handleCadastrar}
               />
 
             {contas && exibeLookUpContas &&
               <LookUpComboBox 
                 children 
                 dataList={contas} 
-                sheetRef={sheetRef} 
+                sheetRef={sheetRefConta} 
                 selectedValue={setContaSelecionada} 
                 title='Contas'
               /> 
             }
+
+            {categorias && exibeLookUpCategorias &&
+              <LookUpComboBox 
+                children 
+                dataList={categorias} 
+                sheetRef={sheetRefCategoria} 
+                selectedValue={setCategoriaSelecionada} 
+                title='Contas'
+              /> 
+            }            
 
             {exibeDatePicker && (
               <DateTimePicker
