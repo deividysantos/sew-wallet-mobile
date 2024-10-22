@@ -23,13 +23,24 @@ export type LancamentosCreateModal = {
   setVisible: (e:boolean) => void
 }
 
+const LancamentoZerado = {
+  CATEGORIA_ID: 0, 
+  CONTA_ID: 0, 
+  DESCRICAO: '', 
+  LANCAMENTO_ID: 0, 
+  TITULO: '', 
+  VALOR: 0, 
+  DATA: new Date, 
+  EFETIVADA: 'N'
+};
+
 export default function LancamentosCreateModal( { visible, setVisible } : LancamentosCreateModal ) {
   function Close(){
     setVisible(false); 
     setTipoLancamento('');
     setExibeLookUpContas(false);
     setContaSelecionada(null);
-    setFomulario({ CATEGORIA_ID: 0, CONTA_ID: 0, DESCRICAO: '', LANCAMENTO_ID: 0, TITULO: '', VALOR: 0, DATA: new Date});
+    setFomulario(LancamentoZerado);
     setExibeLookUpCategorias(false);
     setCategoriaSelecionada(null);
   }
@@ -51,7 +62,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
     CarregaCategorias();
   }, [tipoLancamento]);
 
-  const [ formulario, setFomulario ] = useState<Lancamento>({ CATEGORIA_ID: 0, CONTA_ID: 0, DESCRICAO: '', LANCAMENTO_ID: 0, TITULO: '', VALOR: 0, DATA: new Date});
+  const [ formulario, setFomulario ] = useState<Lancamento>(LancamentoZerado);
 
   const sheetRefConta = useRef<BottomSheet>(null);
   const [contas, setContas] = useState<FieldResult[]|null>(null);
@@ -101,7 +112,9 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
       return
     }
 
-    const categoriasFiled = categoriasResult.map( (categoria) => {
+    const categoriasFiled = categoriasResult.filter((categoria) => {
+      return categoria.TIPO == tipoLancamento
+    }).map( (categoria) => {
       return { text: categoria.CATEGORIA_NOME, value: categoria.CATEGORIA_ID }
     });
 
@@ -303,8 +316,121 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
         </>}
 
         {tipoLancamento === 'D' && <>
-            <TouchableOpacity  style={[styles.options, {backgroundColor: backgroundSoft}]} activeOpacity={1}>
-            <ThemedText>agora vai</ThemedText>
+            <TouchableOpacity  style={[styles.receber, {backgroundColor: backgroundSoft}]} activeOpacity={1}>
+              
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                <ThemedText type='subtitle' style={{marginBottom: 10}}> Despesa </ThemedText>
+                <TouchableOpacity
+                  onPress={() => { Close() }}
+                >
+                  <Ionicons size={40} name="close" style={{ color: text }} />
+                </TouchableOpacity>
+                
+              </View>
+
+              <ThemedText> Título </ThemedText>
+              <ThemedTextInput 
+                style={{marginBottom: 7, borderColor: 'red'}} 
+                value={formulario.TITULO}
+                onChangeText={ (novoTitulo => setFomulario( (prev) => ({...prev, TITULO: novoTitulo}) ) ) }
+              />
+
+              <View style={{flexDirection: 'row', gap: 10, marginBottom: 7}}>
+                <View style={{flex: 1}}>
+                  <ThemedText >Valor</ThemedText>  
+                  <ThemedTextInput 
+                    keyboardType = 'numeric'
+                    style={{marginBottom: 7, borderColor: 'red'}}
+                    value={formulario.VALOR.toString()}
+                    onChangeText={ (novoValor => setFomulario( (prev) => ({...prev, VALOR: Number(novoValor)}) )) }
+                  />
+                </View>
+
+                <View style={{flex: 2}}>
+                  <ThemedText> Categoria </ThemedText>
+                  <ThemedTextInput 
+                    value={ categoriaSelecionada?.text }
+                    onPress={ () => {
+                      Keyboard.dismiss();
+                      openLookUpCategorias();
+                    }} 
+                    style={{borderColor: 'red'}}
+                    showSoftInputOnFocus={false}
+                  />
+                </View>
+              </View>          
+
+              <View style={{flexDirection: 'row', gap: 10, marginBottom: 7}}>
+                <View style={{flex: 2}}>
+                  <ThemedText> Conta </ThemedText>
+                  <ThemedTextInput 
+                    value={ contaSelecionada?.text }
+                    onPress={ () => {
+                      Keyboard.dismiss();
+                      openLookUpContas();
+                    }} 
+                    showSoftInputOnFocus={false}
+                    style={{borderColor: 'red'}}
+                  />
+                </View>
+
+
+                <View style={{flex: 1}}>
+                  <ThemedText> Data </ThemedText>
+                  <ThemedTextInput
+                    value={formulario.DATA.toLocaleDateString()}
+                    onPress={ () => {
+                      setExibeDatePicker(true);
+                    }}
+                    showSoftInputOnFocus={false}
+                    style={{borderColor: 'red'}}
+                  />
+                </View>
+              </View>           
+
+              <ThemedText> Descrição </ThemedText>
+              <ThemedTextInput 
+                value={formulario.DESCRICAO.toString()}
+                onChangeText={ (novaDesc => setFomulario( (prev) => ({...prev, DESCRICAO: novaDesc}) )) }
+                style={{marginBottom: 7, height: 100, borderColor: 'red'}}
+                multiline
+              />
+
+              <ThemedButton 
+                style={{alignItems: 'center', marginTop: 10, borderColor: 'red'}} 
+                text='Cadastrar'
+                onPress={handleCadastrar}
+              />
+
+            {contas && exibeLookUpContas &&
+              <LookUpComboBox 
+                children 
+                dataList={contas} 
+                sheetRef={sheetRefConta} 
+                selectedValue={setContaSelecionada} 
+                title='Contas'
+              /> 
+            }
+
+            {categorias && exibeLookUpCategorias &&
+              <LookUpComboBox 
+                children 
+                dataList={categorias} 
+                sheetRef={sheetRefCategoria} 
+                selectedValue={setCategoriaSelecionada} 
+                title='Contas'
+              /> 
+            }            
+
+            {exibeDatePicker && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={formulario.DATA}
+                mode='date'
+                onChange={selecionaData}
+              />
+            )}            
+
             </TouchableOpacity>
         </>}
       </TouchableOpacity>

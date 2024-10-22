@@ -78,6 +78,7 @@ export default function LancamentosScreen() {
               <ThemedText>{lancamento.item.DESCRICAO}</ThemedText>
               <ThemedText>{lancamento.item.TIPO}</ThemedText>
               <ThemedText>{lancamento.item.VALOR}</ThemedText>
+              <ThemedText>{lancamento.item.EFETIVADA}</ThemedText>
             </ThemedView> 
           </ThemedView>}
         />

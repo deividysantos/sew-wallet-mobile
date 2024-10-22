@@ -92,6 +92,7 @@ export async function initDataBase (){
                 DESCRICAO TEXT,
                 VALOR NUMERIC(15,2),
                 DATA DATE,
+                EFETIVADA TEXT,
                 FOREIGN KEY (CONTA_ID) REFERENCES CONTA(CONTA_ID),
                 FOREIGN KEY (CATEGORIA_ID) REFERENCES CATEGORIA(CATEGORIA_ID)
             );
