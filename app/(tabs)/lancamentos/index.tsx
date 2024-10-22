@@ -49,7 +49,7 @@ export default function LancamentosScreen() {
       if (!result) {
         return
       }
-      console.log(result)
+      
       setLancamentos(result);
     } catch (e:any){
       console.log(e.message);
@@ -70,17 +70,30 @@ export default function LancamentosScreen() {
         <FlatList
           data={lancamentos}
           renderItem={(lancamento) => 
-          <ThemedView style={{ marginBottom: 15}}>
-            <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
-              <ThemedText>{lancamento.item.TITULO}</ThemedText>
-              <ThemedText>{lancamento.item.CATEGORIA}</ThemedText>
-              <ThemedText>{lancamento.item.CONTA}</ThemedText>
-              <ThemedText>{lancamento.item.DESCRICAO}</ThemedText>
-              <ThemedText>{lancamento.item.TIPO}</ThemedText>
-              <ThemedText>{lancamento.item.VALOR}</ThemedText>
-              <ThemedText>{lancamento.item.EFETIVADA}</ThemedText>
-            </ThemedView> 
-          </ThemedView>}
+            <>
+              <ThemedText>{lancamento.item.DATA}</ThemedText>
+              <ThemedView style={{ marginBottom: 15, borderWidth: 1, borderRadius: 8, borderColor: lancamento.item.TIPO == 'Débito' ? 'red' : 'green' }}>
+                <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
+                    
+                    <ThemedView style={{ flexDirection: 'column' }}>
+                      <ThemedText type='subtitle'>{lancamento.item.TITULO}</ThemedText>
+
+                      <ThemedView style={{ flexDirection: 'row' }}>
+                        <ThemedText>{lancamento.item.CATEGORIA} | </ThemedText> 
+                        <ThemedText>{lancamento.item.CONTA}</ThemedText>
+                      </ThemedView>
+
+                    </ThemedView>
+                    
+                    <ThemedView style={{ flexDirection: 'column' }}>
+                      <ThemedText>{lancamento.item.VALOR}</ThemedText>
+                      <ThemedText>{lancamento.item.EFETIVADA}</ThemedText>
+                    </ThemedView>
+                </ThemedView> 
+              </ThemedView>
+            </>
+          }
+          
         />
 
         <AddDownButton onPress={() => { setModal(true) } }/>

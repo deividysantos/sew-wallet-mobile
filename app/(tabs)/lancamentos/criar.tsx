@@ -177,7 +177,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
 
             <View style={{ flexDirection: 'row', gap: 50 }}>
               <TouchableOpacity
-                onPress={() => { setTipoLancamento('C') }}
+                onPress={() => { setTipoLancamento('R') }}
                 style={styles.btnTipoLancamento}
               >
                 <Ionicons size={40} name="arrow-up-outline" style={{ color: 'green' }} />
@@ -199,7 +199,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
           </TouchableOpacity>
         }
 
-        {tipoLancamento === 'C' && <>
+        {tipoLancamento === 'R' && <>
             <TouchableOpacity  style={[styles.receber, {backgroundColor: backgroundSoft}]} activeOpacity={1}>
               
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
