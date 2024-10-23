@@ -14,7 +14,7 @@ export class LancamentoRepository {
         const statement = await db.prepareAsync(`INSERT INTO LANCAMENTO (CONTA_ID, CATEGORIA_ID, TITULO, DESCRICAO, VALOR, DATA, EFETIVADA) VALUES ($conta_id, $categoria_id, $titulo, $descricao, $valor, $data, $efetivada)`);
         
         try {
-            await statement.executeAsync({$conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toLocaleDateString(), $efetivada: lancamento.EFETIVADA});
+            await statement.executeAsync({$conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toLocaleDateString('pt-br', {timeZone: 'UTC', dateStyle: 'short'}), $efetivada: lancamento.EFETIVADA});
         } finally {
             await statement.finalizeAsync();
         }
@@ -27,11 +27,13 @@ export class LancamentoRepository {
             throw new Error(result.error.errors[0].message);
         }
 
+        
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+        
         const statement = await db.prepareAsync(`UPDATE LANCAMENTO SET CONTA_ID = $conta_id, CATEGORIA_ID = $categoria_id, TITULO = $titulo, DESCRICAO = $descricao, VALOR = $valor, DATA = $data, EFETIVADA = $efetivada WHERE LANCAMENTO_ID = $lancamento_id`);
-
+        
         try {
-            await statement.executeAsync({ $lancamento_id: lancamento.LANCAMENTO_ID, $conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toLocaleString(), $efetivada: lancamento.EFETIVADA});
+            await statement.executeAsync({ $lancamento_id: lancamento.LANCAMENTO_ID, $conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toLocaleDateString('pt-br', {timeZone: 'UTC', dateStyle: 'short'}), $efetivada: lancamento.EFETIVADA});
         } finally {
             await statement.finalizeAsync();
         }
@@ -49,8 +51,9 @@ export class LancamentoRepository {
     }
 
     async getAllByUser(usuario_id : number, data_inicio?: string, data_fim?: string): Promise<LancamentoDescrito[]|null>{
+        
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
-
+        
         let condicoes = '';
 
         if (data_inicio) {
@@ -60,6 +63,8 @@ export class LancamentoRepository {
         if (data_fim) {
             condicoes += '   AND L.DATA <= ' + data_fim + ' ';
         }
+
+        
 
         const result = db.getAllAsync<LancamentoDescrito>(`
             SELECT L.TITULO,
@@ -84,7 +89,7 @@ export class LancamentoRepository {
             ${condicoes}
             ORDER BY L.DATA
         `, usuario_id);
-
+        
         return result;
     }
 }

@@ -146,7 +146,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
 
   async function handleCadastrar(){
     const lancamentoRepository = new LancamentoRepository;
-
+    console.log(formulario)
     try {
       await lancamentoRepository.createLancamento(formulario);
     } catch (e: any) {
@@ -429,7 +429,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
                 mode='date'
                 onChange={selecionaData}
               />
-            )}            
+            )}
 
             </TouchableOpacity>
         </>}
