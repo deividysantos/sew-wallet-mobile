@@ -39,6 +39,7 @@ export default function LancamentosScreen() {
     atualizaDados();
   }, [])
 
+  const [diasComLancamentos, setDiasComLancamentos] = useState<string[]>([]);
   const [lancamentos, setLancamentos] = useState<LancamentoDescrito[]>([]);
   async function atualizaDados(){
     const lancamentoRepository = new LancamentoRepository();
@@ -49,12 +50,20 @@ export default function LancamentosScreen() {
       if (!result) {
         return
       }
-      
+   
+      let dias = result.map((lancamento) => {
+        return lancamento.DATA
+      });
+
+      dias = dias.filter(function(este, i) {
+        return dias.indexOf(este) === i;
+      });
+
+      setDiasComLancamentos(dias);
       setLancamentos(result);
     } catch (e:any){
       console.log(e.message);
     }
-
   }
 
   return (
@@ -68,30 +77,38 @@ export default function LancamentosScreen() {
           />
 
         <FlatList
-          data={lancamentos}
-          renderItem={(lancamento) => 
-            <>
-              <ThemedText>{lancamento.item.DATA}</ThemedText>
-              <ThemedView style={{ marginBottom: 15, borderWidth: 1, borderRadius: 8, borderColor: lancamento.item.TIPO == 'Débito' ? 'red' : 'green' }}>
-                <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
-                    
-                    <ThemedView style={{ flexDirection: 'column' }}>
-                      <ThemedText type='subtitle'>{lancamento.item.TITULO}</ThemedText>
+          data={diasComLancamentos}
+          renderItem={(dia) => 
+              <ThemedView style={{marginBottom: 20}}>
+                <ThemedText style={{ fontSize: 18, borderTopWidth: 1, borderColor: 'gray' }}>{dia.item}</ThemedText>
+                <ThemedView style={{gap: 15}}>
+                  {lancamentos.filter((lancamento) => {return dia.item == lancamento.DATA}).map((lancamento) => {
+                    return (
+                      <> 
+                        <ThemedView style={{borderLeftWidth: 1, borderColor: lancamento.TIPO == 'Débito' ? 'red' : 'green' }}>
+                          <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
+                              
+                              <ThemedView style={{ flexDirection: 'column' }}>
+                                <ThemedText type='subtitle'>{lancamento.TITULO}</ThemedText>
 
-                      <ThemedView style={{ flexDirection: 'row' }}>
-                        <ThemedText>{lancamento.item.CATEGORIA} | </ThemedText> 
-                        <ThemedText>{lancamento.item.CONTA}</ThemedText>
-                      </ThemedView>
+                                <ThemedView style={{ flexDirection: 'row' }}>
+                                  <ThemedText>{lancamento.CATEGORIA} | </ThemedText> 
+                                  <ThemedText>{lancamento.CONTA}</ThemedText>
+                                </ThemedView>
 
-                    </ThemedView>
-                    
-                    <ThemedView style={{ flexDirection: 'column' }}>
-                      <ThemedText>{lancamento.item.VALOR}</ThemedText>
-                      <ThemedText>{lancamento.item.EFETIVADA}</ThemedText>
-                    </ThemedView>
-                </ThemedView> 
+                              </ThemedView>
+                              
+                              <ThemedView style={{ flexDirection: 'column' }}>
+                                <ThemedText>{lancamento.VALOR}</ThemedText>
+                                <ThemedText>{lancamento.EFETIVADA}</ThemedText>
+                              </ThemedView>
+                          </ThemedView> 
+                        </ThemedView>
+                      </>
+                    )
+                  })}
+                </ThemedView>
               </ThemedView>
-            </>
           }
           
         />
