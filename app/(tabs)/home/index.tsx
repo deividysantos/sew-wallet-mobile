@@ -37,7 +37,12 @@ export default function Index() {
     setSaldoContas(saldos);
 
     const lancamentoRepository = new LancamentoRepository();
-    const despesas = await lancamentoRepository.getDespesasPendentes(user.USUARIO_ID);
+
+    const dataNow = new Date();
+    const mes = dataNow.getMonth() + 1;
+    const ano = dataNow.getFullYear();
+
+    const despesas = await lancamentoRepository.getDespesasPendentes(user.USUARIO_ID, mes, ano);
     setDepespesasPendentes(despesas);
   }
 
@@ -75,9 +80,9 @@ export default function Index() {
           >
             <ThemedView style={{gap: 15, flexDirection: 'row'}}>
             {despesasPendentes ?
-              despesasPendentes.map( (despesa) => {
+              despesasPendentes.map( (despesa, i) => {
                 return (
-                  <ThemedView style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150}}>
+                  <ThemedView key={i} style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150}}>
                     <ThemedText>{despesa.nome}</ThemedText>
                     <ThemedText style={{color: 'red'}}>{despesa.valorFormatado}</ThemedText>
                     <ThemedText>{ new Date(despesa.data).toLocaleDateString('pt-br') }</ThemedText>

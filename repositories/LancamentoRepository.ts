@@ -135,7 +135,8 @@ export class LancamentoRepository {
             const ultimoDiaMes = new Date(ano, mes, 0).toISOString().slice(0, 10);
             const primeiroDiaMes = new Date(ano, mes-1, 1).toISOString().slice(0, 10);
 
-            condicoes = `   AND L.DATA BETWEEN '${primeiroDiaMes}' AND '${ultimoDiaMes}`
+            condicoes = `   AND L.DATA BETWEEN '${primeiroDiaMes}' AND '${ultimoDiaMes}' `
+            console.log(condicoes)
         }
 
         const result = db.getAllAsync<DespesasPendentesType>(`
