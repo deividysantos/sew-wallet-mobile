@@ -1,20 +1,35 @@
 import { Lancamento, LancamentoDescrito, ValidateLancamento } from "@/types/lancamentos";
 import * as SQLite from 'expo-sqlite';
 
+export type InfoMesType = {
+    entradas: number, 
+    saidas: number,
+    balanco: number
+};
+
+export type DespesasPendentesType = {
+    nome: string,
+    valor: number,
+    valorFormatado: string,
+    data: Date
+}
+
 export class LancamentoRepository {
 
     async createLancamento (lancamento: Lancamento): Promise<void>  {
+        console.log('teste')
         const result = ValidateLancamento.safeParse(lancamento);
-        
+        console.log('teste1')
         if (!result.success) {
             throw new Error(result.error.errors[0].message);
         }
-
+        console.log('teste2')
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
         const statement = await db.prepareAsync(`INSERT INTO LANCAMENTO (CONTA_ID, CATEGORIA_ID, TITULO, DESCRICAO, VALOR, DATA, EFETIVADA) VALUES ($conta_id, $categoria_id, $titulo, $descricao, $valor, $data, $efetivada)`);
+        console.log(lancamento.DATA.toISOString().slice(0, 10))
         
         try {
-            await statement.executeAsync({$conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toLocaleDateString('pt-br', {timeZone: 'UTC', dateStyle: 'short'}), $efetivada: lancamento.EFETIVADA});
+            await statement.executeAsync({$conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toISOString().slice(0, 10), $efetivada: lancamento.EFETIVADA});
         } finally {
             await statement.finalizeAsync();
         }
@@ -33,7 +48,7 @@ export class LancamentoRepository {
         const statement = await db.prepareAsync(`UPDATE LANCAMENTO SET CONTA_ID = $conta_id, CATEGORIA_ID = $categoria_id, TITULO = $titulo, DESCRICAO = $descricao, VALOR = $valor, DATA = $data, EFETIVADA = $efetivada WHERE LANCAMENTO_ID = $lancamento_id`);
         
         try {
-            await statement.executeAsync({ $lancamento_id: lancamento.LANCAMENTO_ID, $conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toLocaleDateString('pt-br', {timeZone: 'UTC', dateStyle: 'short'}), $efetivada: lancamento.EFETIVADA});
+            await statement.executeAsync({ $lancamento_id: lancamento.LANCAMENTO_ID, $conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toISOString().slice(0, 10), $efetivada: lancamento.EFETIVADA});
         } finally {
             await statement.finalizeAsync();
         }
@@ -64,8 +79,6 @@ export class LancamentoRepository {
             condicoes += '   AND L.DATA <= ' + data_fim + ' ';
         }
 
-        
-
         const result = db.getAllAsync<LancamentoDescrito>(`
             SELECT L.TITULO,
                    L.DESCRICAO,
@@ -73,13 +86,13 @@ export class LancamentoRepository {
                    C.NOME AS CATEGORIA,
                    CO.NOME AS CONTA,
                    CASE 
-                     WHEN C.TIPO = 'C' THEN 'Crédito'
+                     WHEN C.TIPO = 'R' THEN 'Crédito'
                      WHEN C.TIPO = 'D' THEN 'Débito'
                    END TIPO,
-                   L.VALOR,
+                   replace(printf('R$ %.2f', L.VALOR), '.', ',') AS VALOR,
                    CASE
-                     WHEN L.EFETIVADA = 'S' THEN 'Sim'
-                     ELSE 'Não'
+                     WHEN L.EFETIVADA = 'S' THEN 'Efetivado'
+                     ELSE 'Pendente'
                    end EFETIVADA
               FROM LANCAMENTO L
              INNER JOIN CATEGORIA C ON C.CATEGORIA_ID = L.CATEGORIA_ID
@@ -92,4 +105,51 @@ export class LancamentoRepository {
         
         return result;
     }
+    
+    async getInfoMes(usuario_id: number, mes: number, ano:number): Promise<InfoMesType|null>{
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+        
+        const ultimoDiaMes = new Date(ano, mes, 0).toISOString().slice(0, 10);
+        const primeiroDiaMes = new Date(ano, mes-1, 1).toISOString().slice(0, 10);
+
+        const result = db.getFirstAsync<InfoMesType>(`
+            SELECT replace(printf('R$ %.2f', SUM( CASE WHEN C.TIPO = 'R' THEN 1 ELSE 0 END * L.VALOR )), '.', ',') AS entradas,
+                   replace(printf('R$ %.2f', SUM( CASE WHEN C.TIPO = 'D' THEN 1 ELSE 0 END * L.VALOR )), '.', ',') AS saidas,
+                   replace(printf('R$ %.2f', SUM( CASE WHEN C.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END )), '.', ',') AS balanco
+             FROM LANCAMENTO L
+            INNER JOIN CATEGORIA C ON C.CATEGORIA_ID = L.CATEGORIA_ID
+            WHERE C.USUARIO_ID = ${usuario_id}
+              AND L.DATA BETWEEN '${primeiroDiaMes}' AND '${ultimoDiaMes}'
+        `);
+
+        return result;
+    }
+
+    async getDespesasPendentes(usario_id: number, mes?: number, ano?: number): Promise<DespesasPendentesType[]|null> {
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+
+        
+        let condicoes = '';
+        
+        if (ano && mes) {
+            const ultimoDiaMes = new Date(ano, mes, 0).toISOString().slice(0, 10);
+            const primeiroDiaMes = new Date(ano, mes-1, 1).toISOString().slice(0, 10);
+
+            condicoes = `   AND L.DATA BETWEEN '${primeiroDiaMes}' AND '${ultimoDiaMes}`
+        }
+
+        const result = db.getAllAsync<DespesasPendentesType>(`
+            SELECT L.TITULO AS nome,
+                   L.VALOR AS valor,
+                   replace(printf('R$ %.2f', L.VALOR), '.', ',') AS valorFormatado,
+                   L.DATA
+              FROM LANCAMENTO L
+             INNER JOIN CATEGORIA C ON C.CATEGORIA_ID = L.CATEGORIA_ID
+             WHERE C.USUARIO_ID = ${usario_id}
+             ${condicoes}
+        `);
+
+        return result
+    }
+    
 }

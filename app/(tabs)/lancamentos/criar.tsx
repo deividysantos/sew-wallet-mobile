@@ -260,7 +260,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
                 <View style={{flex: 1}}>
                   <ThemedText> Data </ThemedText>
                   <ThemedTextInput
-                    value={formulario.DATA.toLocaleDateString()}
+                    value={formulario.DATA.toLocaleDateString('pt-br')}
                     onPress={ () => {
                       setExibeDatePicker(true);
                     }}
@@ -378,7 +378,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
                 <View style={{flex: 1}}>
                   <ThemedText> Data </ThemedText>
                   <ThemedTextInput
-                    value={formulario.DATA.toLocaleDateString()}
+                    value={formulario.DATA.toLocaleDateString('pt-br')}
                     onPress={ () => {
                       setExibeDatePicker(true);
                     }}

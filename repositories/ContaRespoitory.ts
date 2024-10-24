@@ -1,6 +1,12 @@
 import { Conta, ContaDescrita, ValidateConta } from "@/types/conta";
 import * as SQLite from 'expo-sqlite';
 
+export type SaldoContaType = {
+    conta: string,
+    saldoFormatado: string,
+    saldo: number
+}
+
 export class ContaRepository {
 
     async createConta (conta : Conta): Promise<number|null>  {
@@ -73,6 +79,26 @@ export class ContaRepository {
             WHERE U.USUARIO_ID = ?
             `, usuario_id
         );
+
+        return result;
+    }
+
+    async getSaldoContas(usuario_id: number, data: Date): Promise<SaldoContaType[]|null>{
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+
+        const diaVerificacao = new Date(data).toISOString().slice(0, 10);
+        
+        const result = db.getAllAsync<SaldoContaType>(`
+            SELECT C.NOME AS conta,
+                   replace(printf('R$ %.2f', SUM( CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ) + C.SALDO_INICIAL), '.', ',') AS saldoFormatado,
+                   SUM( CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ) + C.SALDO_INICIAL AS saldo
+              FROM LANCAMENTO L
+             INNER JOIN CATEGORIA CAT ON L.CATEGORIA_ID = CAT.CATEGORIA_ID
+             INNER JOIN CONTA C ON L.CONTA_ID = C.CONTA_ID
+            WHERE CAT.USUARIO_ID = ${usuario_id}
+              AND L.DATA <= '${diaVerificacao}'
+            GROUP BY C.NOME, C.SALDO_INICIAL
+        `);
 
         return result;
     }

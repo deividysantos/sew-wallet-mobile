@@ -69,7 +69,7 @@ export default function ContasScreen() {
     
     <SafeAreaView style={[styles.container, { backgroundColor: backgroundHard }]}>
         <StatusBar
-            backgroundColor={backgroundHard}
+            backgroundColor={backgroundSoft}
             barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
             translucent={false}
         /> 

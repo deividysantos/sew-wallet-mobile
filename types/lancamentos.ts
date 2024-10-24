@@ -15,7 +15,7 @@ export type LancamentoDescrito = {
     TITULO: string,
     DESCRICAO: string,
     VALOR: number,
-    DATA: string,
+    DATA: Date,
     CATEGORIA: string,
     CONTA: string,
     TIPO: string,

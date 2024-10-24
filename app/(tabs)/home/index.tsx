@@ -1,70 +1,134 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { StyleSheet, SafeAreaView, StatusBar, ScrollView } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation, useRouter, Stack } from 'expo-router';
+import { useState, useEffect, useCallback } from 'react';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
+
+import { useAuth } from '@/contexts/AuthContext';
+
+import { ContaRepository, SaldoContaType } from '@/repositories/ContaRespoitory';
+import { LancamentoRepository, DespesasPendentesType } from '@/repositories/LancamentoRepository';
 
 export default function Index() {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  const text = useThemeColor({}, 'text');
+  const backgroundSoft = useThemeColor({}, 'backgroundSoft');
+  const backgroundHard = useThemeColor({}, 'backgroundHard');
+
+  const [saldoContas, setSaldoContas] = useState<SaldoContaType[]|null>(null);
+  const [despesasPendentes, setDepespesasPendentes] = useState<DespesasPendentesType[]|null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      atualizaDados();
+    }, [])
+  );
+
+  async function atualizaDados(){
+    const contaRepository = new ContaRepository();
+
+    const saldos = await contaRepository.getSaldoContas(user.USUARIO_ID, new Date());
+    setSaldoContas(saldos);
+
+    const lancamentoRepository = new LancamentoRepository();
+    const despesas = await lancamentoRepository.getDespesasPendentes(user.USUARIO_ID);
+    setDepespesasPendentes(despesas);
+  }
+
+  function getTotalSaldoContas(): string {
+    const total = saldoContas?.reduce( (accumulator: number, currentValue: SaldoContaType) => {
+      return accumulator + currentValue.saldo;
+    }, 0)
+
+    if (total) {
+      return 'R$ ' + total.toFixed(2).replace('.',',')
+    }
+
+    return ''
+  }
+  
+  
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <>
+      <Stack.Screen options={{ headerShown: false }}/>
+      <SafeAreaView style={[styles.container, { backgroundColor: backgroundHard }]}>
+        <StatusBar
+              backgroundColor={backgroundSoft}
+              barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
+              translucent={false}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>  
+
+        <ThemedView style={{padding: 15}}>
+
+          <ThemedView>
+            <ThemedText type='subtitle'>Despesas Pendentes</ThemedText>
+          </ThemedView>
+
+          <ScrollView
+            horizontal
+          >
+            <ThemedView style={{gap: 15, flexDirection: 'row'}}>
+            {despesasPendentes ?
+              despesasPendentes.map( (despesa) => {
+                return (
+                  <ThemedView style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150}}>
+                    <ThemedText>{despesa.nome}</ThemedText>
+                    <ThemedText style={{color: 'red'}}>{despesa.valorFormatado}</ThemedText>
+                  </ThemedView>
+                )
+              } ) :
+              <><ThemedText>Não existem despesas pendentes</ThemedText></>
+            }           
+            </ThemedView> 
+          </ScrollView>
+
+        </ThemedView>
+
+        <ThemedView style={{gap: 15}}>
+
+          <ThemedView style={{ padding: 15, backgroundColor: backgroundSoft, marginTop: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
+            <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <ThemedText style={{fontSize: 18}}>Saldo em contas | {new Date().toLocaleDateString('pt-br')} |</ThemedText>
+              <Ionicons name='add' size={30} color={text} />
+            </ThemedView>
+
+            <ThemedView>
+              {saldoContas?.map( (saldo) => {
+                return (
+                  <>
+                    <ThemedText>
+                      {saldo.conta}
+                    </ThemedText>
+                    <ThemedText>
+                      {saldo.saldoFormatado}
+                    </ThemedText>
+                  </>
+                )
+              })}
+            </ThemedView>
+
+            <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, marginTop: 10, borderTopColor: 'gray', paddingTop: 15}}>
+              <ThemedText type='subtitle'>Total</ThemedText>
+              <ThemedText> {getTotalSaldoContas()} </ThemedText>
+            </ThemedView>
+          </ThemedView>
+          
+
+
+        </ThemedView>
+      </SafeAreaView>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
+  container: {
+      flex: 1,
+    }
 });
