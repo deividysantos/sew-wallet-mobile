@@ -73,22 +73,17 @@ export default function LancamentosScreen() {
       setMesSelecionado(0);
       return;
     }
-
-    const getInfo = async () => {
-      const lancamentoRepository = new LancamentoRepository();
-      const infoMes = await lancamentoRepository.getInfoMes(user.USUARIO_ID, mesSelecionado+1, 2024)
-      SetInfoMes(infoMes);
-    }
     
     getInfo();
   }, [mesSelecionado]);
   
-  async function atualizaDados(){
+  const getInfo = async () => {
+    const lancamentoRepository = new LancamentoRepository();
+    const infoMes = await lancamentoRepository.getInfoMes(user.USUARIO_ID, mesSelecionado+1, 2024)
+    SetInfoMes(infoMes);
+  }
 
-    if (mesSelecionado !== new Date().getMonth()) {
-      setMesSelecionado(new Date().getMonth())
-      return;
-    }
+  async function atualizaDados(){
 
     const lancamentoRepository = new LancamentoRepository();
 
@@ -106,12 +101,13 @@ export default function LancamentosScreen() {
       dias = dias.filter(function(este, i) {
         return dias.indexOf(este) === i;
       });
-
+      
       setDiasComLancamentos(dias.map((dia) => {
         return new Date(dia).toLocaleDateString('pt-br')
       }));
 
       setLancamentos(result);
+      getInfo();
     } catch (e:any){
       console.log(e.message);
     }
@@ -220,7 +216,7 @@ export default function LancamentosScreen() {
         </ScrollView>
         <AddDownButton onPress={() => { setModal(true) } }/>
 
-        <LancamentosCreateModal  visible={modal} setVisible={setModal}/>
+        <LancamentosCreateModal  visible={modal} setVisible={setModal} onClose={atualizaDados}/>
       </SafeAreaView>
     </>
   );

@@ -20,7 +20,8 @@ import { CategoriaRepository } from '@/repositories/CategoriaRepository';
 
 export type LancamentosCreateModal = {
   visible: boolean,
-  setVisible: (e:boolean) => void
+  setVisible: (e:boolean) => void,
+  onClose: () => void
 }
 
 const LancamentoZerado = {
@@ -34,7 +35,7 @@ const LancamentoZerado = {
   EFETIVADA: 'N'
 };
 
-export default function LancamentosCreateModal( { visible, setVisible } : LancamentosCreateModal ) {
+export default function LancamentosCreateModal( { visible, setVisible, onClose } : LancamentosCreateModal ) {
   function Close(){
     setVisible(false); 
     setTipoLancamento('');
@@ -43,6 +44,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
     setFomulario(LancamentoZerado);
     setExibeLookUpCategorias(false);
     setCategoriaSelecionada(null);
+    onClose();
   }
 
   const router = useRouter();
@@ -146,7 +148,7 @@ export default function LancamentosCreateModal( { visible, setVisible } : Lancam
 
   async function handleCadastrar(){
     const lancamentoRepository = new LancamentoRepository;
-    console.log(formulario)
+
     try {
       await lancamentoRepository.createLancamento(formulario);
     } catch (e: any) {

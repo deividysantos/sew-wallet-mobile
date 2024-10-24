@@ -17,16 +17,16 @@ export type DespesasPendentesType = {
 export class LancamentoRepository {
 
     async createLancamento (lancamento: Lancamento): Promise<void>  {
-        console.log('teste')
+        console.log(lancamento.DATA.toISOString().slice(0, 10))
         const result = ValidateLancamento.safeParse(lancamento);
-        console.log('teste1')
+        
         if (!result.success) {
             throw new Error(result.error.errors[0].message);
         }
-        console.log('teste2')
+        
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
         const statement = await db.prepareAsync(`INSERT INTO LANCAMENTO (CONTA_ID, CATEGORIA_ID, TITULO, DESCRICAO, VALOR, DATA, EFETIVADA) VALUES ($conta_id, $categoria_id, $titulo, $descricao, $valor, $data, $efetivada)`);
-        console.log(lancamento.DATA.toISOString().slice(0, 10))
+        
         
         try {
             await statement.executeAsync({$conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toISOString().slice(0, 10), $efetivada: lancamento.EFETIVADA});
@@ -142,11 +142,12 @@ export class LancamentoRepository {
             SELECT L.TITULO AS nome,
                    L.VALOR AS valor,
                    replace(printf('R$ %.2f', L.VALOR), '.', ',') AS valorFormatado,
-                   L.DATA
+                   L.DATA AS data
               FROM LANCAMENTO L
              INNER JOIN CATEGORIA C ON C.CATEGORIA_ID = L.CATEGORIA_ID
              WHERE C.USUARIO_ID = ${usario_id}
              ${condicoes}
+             ORDER BY L.DATA
         `);
 
         return result

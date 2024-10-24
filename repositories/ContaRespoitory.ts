@@ -90,13 +90,13 @@ export class ContaRepository {
         
         const result = db.getAllAsync<SaldoContaType>(`
             SELECT C.NOME AS conta,
-                   replace(printf('R$ %.2f', SUM( CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ) + C.SALDO_INICIAL), '.', ',') AS saldoFormatado,
-                   SUM( CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ) + C.SALDO_INICIAL AS saldo
-              FROM LANCAMENTO L
-             INNER JOIN CATEGORIA CAT ON L.CATEGORIA_ID = CAT.CATEGORIA_ID
-             INNER JOIN CONTA C ON L.CONTA_ID = C.CONTA_ID
-            WHERE CAT.USUARIO_ID = ${usuario_id}
-              AND L.DATA <= '${diaVerificacao}'
+                   replace(printf('R$ %.2f', IFNULL(SUM(CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ),0) + C.SALDO_INICIAL), '.', ',') AS saldoFormatado,
+                   IFNULL(SUM( CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ),0) + C.SALDO_INICIAL AS saldo
+             FROM CONTA C
+             LEFT JOIN LANCAMENTO L ON C.CONTA_ID = L.CONTA_ID
+             LEFT JOIN CATEGORIA CAT ON L.CATEGORIA_ID = CAT.CATEGORIA_ID
+            WHERE C.USUARIO_ID = ${usuario_id}
+              AND ((L.DATA <= '${diaVerificacao}') OR (L.DATA IS NULL))
             GROUP BY C.NOME, C.SALDO_INICIAL
         `);
 

@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, SafeAreaView, StatusBar, ScrollView } from 'react-native';
+import { StyleSheet, SafeAreaView, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation, useRouter, Stack } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
@@ -56,7 +56,7 @@ export default function Index() {
   
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }}/>
+      <Stack.Screen/>
       <SafeAreaView style={[styles.container, { backgroundColor: backgroundHard }]}>
         <StatusBar
               backgroundColor={backgroundSoft}
@@ -64,7 +64,7 @@ export default function Index() {
               translucent={false}
         />
 
-        <ThemedView style={{padding: 15}}>
+        <ThemedView style={{padding: 15, gap: 10}}>
 
           <ThemedView>
             <ThemedText type='subtitle'>Despesas Pendentes</ThemedText>
@@ -80,6 +80,7 @@ export default function Index() {
                   <ThemedView style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150}}>
                     <ThemedText>{despesa.nome}</ThemedText>
                     <ThemedText style={{color: 'red'}}>{despesa.valorFormatado}</ThemedText>
+                    <ThemedText>{ new Date(despesa.data).toLocaleDateString('pt-br') }</ThemedText>
                   </ThemedView>
                 )
               } ) :
@@ -94,21 +95,25 @@ export default function Index() {
 
           <ThemedView style={{ padding: 15, backgroundColor: backgroundSoft, marginTop: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
             <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <ThemedText style={{fontSize: 18}}>Saldo em contas | {new Date().toLocaleDateString('pt-br')} |</ThemedText>
-              <Ionicons name='add' size={30} color={text} />
+              <ThemedText style={{fontSize: 18}}>Saldo em contas </ThemedText>
+              <TouchableOpacity onPress={() => {
+                router.push('/cadastros/contas/criar')
+              }}>
+                <Ionicons name='add' size={30} color={text} />
+              </TouchableOpacity>
             </ThemedView>
 
-            <ThemedView>
-              {saldoContas?.map( (saldo) => {
+            <ThemedView >
+              {saldoContas?.map( (saldo, i) => {
                 return (
-                  <>
+                  <ThemedView key={i} style={{flexDirection: 'row', marginVertical: 5, justifyContent: 'space-between'}}>
                     <ThemedText>
-                      {saldo.conta}
+                      {saldo.conta} 
                     </ThemedText>
                     <ThemedText>
                       {saldo.saldoFormatado}
                     </ThemedText>
-                  </>
+                  </ThemedView>
                 )
               })}
             </ThemedView>
