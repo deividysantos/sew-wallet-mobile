@@ -44,12 +44,15 @@ export class ContaRepository {
     async deleteConta(conta_id : number): Promise<boolean>{
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
     
-        const qtdeLctos = await db.getFirstAsync<number>(`SELECT COUNT(L.LANCAMENTO_ID) AS qtdeLctos
+        const result = await db.getFirstAsync<{qtdeLctos: number}>(`SELECT COUNT(L.LANCAMENTO_ID) AS qtdeLctos
                                                             FROM LANCAMENTO L
                                                         INNER JOIN CONTA C ON C.CONTA_ID = L.CONTA_ID
-                                                        WHERE C.CONTA_ID = ? `, conta_id);
-        if ((qtdeLctos ?? 0) > 0) {
-            throw new Error('Não é possível apagar a conta, existem lançamentos financeiros ligados a mesma!');
+                                                        WHERE C.CONTA_ID = ${conta_id} `, );
+        
+        if (result) {
+            if (result.qtdeLctos > 0) {
+                throw new Error('Não é possível apagar a conta, existem lançamentos financeiros ligados a mesma!');
+            }
         }
 
         try {
@@ -88,6 +91,7 @@ export class ContaRepository {
 
         const diaVerificacao = new Date(data).toISOString().slice(0, 10);
         
+        //Refazer sql
         const result = db.getAllAsync<SaldoContaType>(`
             SELECT C.NOME AS conta,
                    replace(printf('R$ %.2f', IFNULL(SUM(CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ),0) + C.SALDO_INICIAL), '.', ',') AS saldoFormatado,
@@ -96,8 +100,22 @@ export class ContaRepository {
              LEFT JOIN LANCAMENTO L ON C.CONTA_ID = L.CONTA_ID
              LEFT JOIN CATEGORIA CAT ON L.CATEGORIA_ID = CAT.CATEGORIA_ID
             WHERE C.USUARIO_ID = ${usuario_id}
-              AND ((L.DATA <= '${diaVerificacao}') OR (L.DATA IS NULL))
+              AND L.DATA <= '${diaVerificacao}'
+              AND L.EFETIVADA = 'S'
             GROUP BY C.NOME, C.SALDO_INICIAL
+            
+            UNION all
+            
+            SELECT C.NOME AS conta,
+                   replace(printf('R$ %.2f', C.SALDO_INICIAL), '.', ',') AS saldoFormatado,
+                   C.SALDO_INICIAL AS saldo
+             FROM CONTA C
+            WHERE C.USUARIO_ID = ${usuario_id}
+              AND NOT EXISTS (SELECT LT.LANCAMENTO_ID 
+                                FROM LANCAMENTO LT 
+                               WHERE LT.CONTA_ID = C.CONTA_ID 
+                                 AND LT.EFETIVADA = 'S' 
+                                 AND LT.DATA <= '${diaVerificacao}')
         `);
 
         return result;

@@ -12,6 +12,7 @@ export type Lancamento = {
 };
 
 export type LancamentoDescrito = {
+    LANCAMENTO_ID: number,
     TITULO: string,
     DESCRICAO: string,
     VALOR: number,

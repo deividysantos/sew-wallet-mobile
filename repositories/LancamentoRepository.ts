@@ -18,7 +18,6 @@ export type DespesasPendentesType = {
 export class LancamentoRepository {
 
     async createLancamento (lancamento: Lancamento): Promise<void>  {
-        console.log(lancamento.DATA.toISOString().slice(0, 10))
         const result = ValidateLancamento.safeParse(lancamento);
         
         if (!result.success) {
@@ -94,7 +93,8 @@ export class LancamentoRepository {
                    CASE
                      WHEN L.EFETIVADA = 'S' THEN 'Efetivado'
                      ELSE 'Pendente'
-                   end EFETIVADA
+                   end EFETIVADA,
+                   L.LANCAMENTO_ID
               FROM LANCAMENTO L
              INNER JOIN CATEGORIA C ON C.CATEGORIA_ID = L.CATEGORIA_ID
              INNER JOIN USUARIO U ON U.USUARIO_ID = C.USUARIO_ID
@@ -129,7 +129,6 @@ export class LancamentoRepository {
     async getDespesasPendentes(usario_id: number, mes?: number, ano?: number): Promise<DespesasPendentesType[]|null> {
         const db = await SQLite.openDatabaseAsync('sew-wallet.db');
 
-        
         let condicoes = '';
         
         if (ano && mes) {
@@ -137,7 +136,6 @@ export class LancamentoRepository {
             const primeiroDiaMes = new Date(ano, mes-1, 1).toISOString().slice(0, 10);
 
             condicoes = `   AND L.DATA BETWEEN '${primeiroDiaMes}' AND '${ultimoDiaMes}' `
-            console.log(condicoes)
         }
 
         const result = db.getAllAsync<DespesasPendentesType>(`
@@ -149,10 +147,24 @@ export class LancamentoRepository {
              INNER JOIN CATEGORIA C ON C.CATEGORIA_ID = L.CATEGORIA_ID
              WHERE C.USUARIO_ID = ${usario_id}
              ${condicoes}
+               AND L.EFETIVADA = 'N'
+               AND C.TIPO = 'D'
              ORDER BY L.DATA
         `);
 
         return result
     }
-    
+
+    async efetivaLancamento(lancamento_id: number){
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+        
+        const statement = await db.prepareAsync(`UPDATE LANCAMENTO SET EFETIVADA = CASE WHEN EFETIVADA = 'S' THEN 'N' ELSE 'S' END WHERE LANCAMENTO_ID = ${lancamento_id}`);
+        
+        try {
+            await statement.executeAsync();
+        } finally {
+            await statement.finalizeAsync();
+        }
+    }
+
 }

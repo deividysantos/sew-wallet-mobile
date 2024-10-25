@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useState, useCallback } from 'react';
-import { StyleSheet, StatusBar, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, StatusBar, SafeAreaView, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -130,6 +130,12 @@ export default function LancamentosScreen() {
     }
   }
 
+  async function handleEfetivaLancamento(lancamento_id: number){
+    const lancamentoRepository = new LancamentoRepository();
+    await lancamentoRepository.efetivaLancamento(lancamento_id);
+    atualizaDados();
+  }
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }}/>
@@ -205,7 +211,7 @@ export default function LancamentosScreen() {
               <ThemedView style={{gap: 15}}>
                 {lancamentos.filter((lancamento) => {return dia == new Date(lancamento.DATA).toLocaleDateString('pt-br') }).map((lancamento) => {
                   return ( 
-                    <ThemedView key={lancamento.TITULO} style={{borderLeftWidth: 2, borderColor: lancamento.TIPO == 'Débito' ? 'red' : 'green' }}>
+                    <ThemedView key={lancamento.TITULO}  style={{borderLeftWidth: 2, borderColor: lancamento.TIPO == 'Débito' ? 'red' : 'green' }}>
                       <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
                           
                           <ThemedView style={{ flexDirection: 'column' }}>
@@ -220,7 +226,15 @@ export default function LancamentosScreen() {
                           
                           <ThemedView style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
                             <ThemedText>{lancamento.VALOR}</ThemedText>
-                            <ThemedText>{lancamento.EFETIVADA}</ThemedText>
+                            <Switch
+                              style={{height: 30}}
+                              trackColor={{false: '#767577', true: '#81b0ff'}}
+                              thumbColor={'#81b0ff'}
+                              onChange={() => {
+                                handleEfetivaLancamento(lancamento.LANCAMENTO_ID);
+                              }}
+                              value={ lancamento.EFETIVADA == 'Efetivado' }
+                            />
                           </ThemedView>
                       </ThemedView>
                     </ThemedView>
