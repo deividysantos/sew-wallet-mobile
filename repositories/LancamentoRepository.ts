@@ -4,7 +4,8 @@ import * as SQLite from 'expo-sqlite';
 export type InfoMesType = {
     entradas: number, 
     saidas: number,
-    balanco: number
+    balanco: number,
+    saldoAnterior: number
 };
 
 export type DespesasPendentesType = {

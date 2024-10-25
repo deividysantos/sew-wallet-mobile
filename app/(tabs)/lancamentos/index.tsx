@@ -15,6 +15,7 @@ import  LancamentosCreateModal  from '@/app/(tabs)/lancamentos/criar'
 import { useNavigation, useRouter, Stack } from 'expo-router';
 import { LancamentoRepository, InfoMesType } from '@/repositories/LancamentoRepository';
 import { LancamentoDescrito } from '@/types/lancamentos';
+import { ContaRepository, SaldoContaType } from '@/repositories/ContaRespoitory';
 
 import { stringToDate } from '@/utils/dateUtils';
 
@@ -79,8 +80,24 @@ export default function LancamentosScreen() {
   
   const getInfo = async () => {
     const lancamentoRepository = new LancamentoRepository();
-    const infoMes = await lancamentoRepository.getInfoMes(user.USUARIO_ID, mesSelecionado+1, 2024)
+    let infoMes = await lancamentoRepository.getInfoMes(user.USUARIO_ID, mesSelecionado + 1, 2024)
+    infoMes!.saldoAnterior = await getSaldoAnterior(new Date(2024, mesSelecionado + 1, 0));
     SetInfoMes(infoMes);
+  }
+
+  async function getSaldoAnterior(data: Date): Promise<number>{
+    const contaRepository = new ContaRepository();
+    const saldoContas = await contaRepository.getSaldoContas(user.USUARIO_ID, data)
+
+    if (!saldoContas){
+      return 0
+    }
+
+    const saldo = saldoContas.reduce( (accumulator: number, conta: SaldoContaType) => {
+      return accumulator + conta.saldo
+    }, 0)
+
+    return saldo;
   }
 
   async function atualizaDados(){
@@ -205,10 +222,14 @@ export default function LancamentosScreen() {
                             <ThemedText>{lancamento.VALOR}</ThemedText>
                             <ThemedText>{lancamento.EFETIVADA}</ThemedText>
                           </ThemedView>
-                      </ThemedView> 
+                      </ThemedView>
                     </ThemedView>
                   )
                 })}
+              </ThemedView>
+              <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'rgba(94, 108, 121, 0.2)', padding: 5, marginTop: 8, borderRadius: 3}}>
+                <ThemedText>Valor no dia</ThemedText>
+                <ThemedText>$150,00</ThemedText>
               </ThemedView>
             </ThemedView>
           )
