@@ -1,7 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, SafeAreaView, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useNavigation, useRouter, Stack } from 'expo-router';
+import { useRouter, Stack } from 'expo-router';
 import { useState, useEffect, useCallback } from 'react';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -11,7 +11,8 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { useAuth } from '@/contexts/AuthContext';
 
 import { ContaRepository, SaldoContaType } from '@/repositories/ContaRespoitory';
-import { LancamentoRepository, DespesasPendentesType, DespesasPorCategoriaType } from '@/repositories/LancamentoRepository';
+import { LancamentoRepository, DespesasPorCategoriaType } from '@/repositories/LancamentoRepository';
+import DespesasPendentes from '@/components/Home/DespesasPendentes';
 
 export default function Index() {
   const router = useRouter();
@@ -21,32 +22,34 @@ export default function Index() {
   const backgroundSoft = useThemeColor({}, 'backgroundSoft');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
 
+  const [key, setKey] = useState(Date.now());
+  const [mesAtual, setMesAtual] = useState<{ mes: number, ano: number }>({ mes: 0, ano: 0 });
   const [saldoContas, setSaldoContas] = useState<SaldoContaType[]|null>(null);
-  const [despesasPendentes, setDepespesasPendentes] = useState<DespesasPendentesType[]|null>(null);
   const [lancamentosPorCategoria, setLancamentosPorCategoria] = useState<{ totalDespesas: number , despesas: DespesasPorCategoriaType[]} |null>(null);
 
   useFocusEffect(
     useCallback(() => {
+      setKey(Date.now());
       atualizaDados();
     }, [])
   );
 
   async function atualizaDados(){
+
+    const dataNow = new Date();
+    const mes = dataNow.getMonth() + 1;
+    const ano = dataNow.getFullYear();
+    
+    if(mes != mesAtual.mes) {
+      setMesAtual( {mes, ano} )
+    }
+
     const contaRepository = new ContaRepository();
 
     const saldos = await contaRepository.getSaldoContas(user.USUARIO_ID, new Date());
     setSaldoContas(saldos);
 
-    const lancamentoRepository = new LancamentoRepository();
-
-    const dataNow = new Date();
-    const mes = dataNow.getMonth() + 1;
-    const ano = dataNow.getFullYear();
-
     getLancamentosPorCategoria();
-
-    const despesas = await lancamentoRepository.getDespesasPendentes(user.USUARIO_ID, mes, ano);
-    setDepespesasPendentes(despesas);
   }
 
   function getTotalSaldoContas(): string {
@@ -64,10 +67,7 @@ export default function Index() {
   async function getLancamentosPorCategoria(){
     const lancamentoRepository = new LancamentoRepository();
 
-    const dataNow = new Date();
-    const mes = dataNow.getMonth() + 1;
-    const ano = dataNow.getFullYear();
-    const lancamentos = await lancamentoRepository.getLancamentosPorCategoria(user.USUARIO_ID, mes, ano);
+    const lancamentos = await lancamentoRepository.getLancamentosPorCategoria(user.USUARIO_ID, mesAtual.mes, mesAtual.ano);
 
     const totalDesp = lancamentos.reduce( (accumulator: number, currentValue: DespesasPorCategoriaType) => {
       return accumulator + currentValue.valor
@@ -86,32 +86,7 @@ export default function Index() {
               translucent={false}
         />
 
-        <ThemedView style={{padding: 15, gap: 10}}>
-
-          <ThemedView>
-            <ThemedText type='subtitle'>Despesas Pendentes</ThemedText>
-          </ThemedView>
-
-          <ScrollView
-            horizontal
-          >
-            <ThemedView style={{gap: 15, flexDirection: 'row'}}>
-            {(despesasPendentes != undefined) && (despesasPendentes.length > 0) ?
-              despesasPendentes.map( (despesa, i) => {
-                return (
-                  <ThemedView key={i} style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150}}>
-                    <ThemedText>{despesa.nome}</ThemedText>
-                    <ThemedText style={{color: 'red'}}>{despesa.valorFormatado}</ThemedText>
-                    <ThemedText>{ new Date(despesa.data).toLocaleDateString('pt-br') }</ThemedText>
-                  </ThemedView>
-                )
-              } ) :
-              <><ThemedText>Não existem despesas pendentes</ThemedText></>
-            }           
-            </ThemedView> 
-          </ScrollView>
-
-        </ThemedView>
+        <DespesasPendentes usuario_id={user.USUARIO_ID} mes={mesAtual.mes} ano={mesAtual.ano} key={key}/>
 
         <ThemedView style={{padding: 12,backgroundColor: backgroundSoft}}>
           <ThemedText type='subtitle'>Gastos por categoria</ThemedText>
