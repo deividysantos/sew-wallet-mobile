@@ -194,6 +194,7 @@ export class LancamentoRepository {
               FROM LANCAMENTO L
              INNER JOIN CATEGORIA C ON L.CATEGORIA_ID = C.CATEGORIA_ID
              WHERE C.USUARIO_ID = ${usuario_id}
+               AND C.TIPO = 'D'
              ${condicoes}
              GROUP BY C.NOME, C.TIPO
         `);
