@@ -23,7 +23,7 @@ export default function Index() {
 
   const [saldoContas, setSaldoContas] = useState<SaldoContaType[]|null>(null);
   const [despesasPendentes, setDepespesasPendentes] = useState<DespesasPendentesType[]|null>(null);
-  const [lancamentosPorCategoria, setLancamentosPorCategoria] = useState<DespesasPorCategoriaType[]|null>(null);
+  const [lancamentosPorCategoria, setLancamentosPorCategoria] = useState<{ totalDespesas: number , despesas: DespesasPorCategoriaType[]} |null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -69,7 +69,11 @@ export default function Index() {
     const ano = dataNow.getFullYear();
     const lancamentos = await lancamentoRepository.getLancamentosPorCategoria(user.USUARIO_ID, mes, ano);
 
-    setLancamentosPorCategoria(lancamentos);
+    const totalDesp = lancamentos.reduce( (accumulator: number, currentValue: DespesasPorCategoriaType) => {
+      return accumulator + currentValue.valor
+    }, 0)
+
+    setLancamentosPorCategoria( { totalDespesas: totalDesp, despesas: lancamentos } );
   }
   
   return (
@@ -114,7 +118,7 @@ export default function Index() {
 
           <ThemedView style={{gap: 10, paddingVertical: 10}}>
           {lancamentosPorCategoria ?
-            lancamentosPorCategoria.map((categoria, i) => {
+            lancamentosPorCategoria.despesas.map((categoria, i) => {
               return (
                 <ThemedView key={i} style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12}}>
                   <ThemedText>{categoria.categoria}</ThemedText>
@@ -128,7 +132,7 @@ export default function Index() {
 
           <ThemedView style={{flexDirection:'row', justifyContent:'space-between', padding: 12, borderTopWidth: 1, borderColor: 'gray'}}>
             <ThemedText type='subtitle'>Total</ThemedText>
-            <ThemedText>$10</ThemedText>
+            <ThemedText>{'R$ ' + lancamentosPorCategoria?.totalDespesas.toFixed(2).replace('.',',')}</ThemedText> 
           </ThemedView>
         </ThemedView>
 
