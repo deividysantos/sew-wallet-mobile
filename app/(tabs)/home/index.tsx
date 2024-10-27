@@ -11,7 +11,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 import { useAuth } from '@/contexts/AuthContext';
 
 import { ContaRepository, SaldoContaType } from '@/repositories/ContaRespoitory';
-import { LancamentoRepository, DespesasPendentesType } from '@/repositories/LancamentoRepository';
+import { LancamentoRepository, DespesasPendentesType, DespesasPorCategoriaType } from '@/repositories/LancamentoRepository';
 
 export default function Index() {
   const router = useRouter();
@@ -23,6 +23,7 @@ export default function Index() {
 
   const [saldoContas, setSaldoContas] = useState<SaldoContaType[]|null>(null);
   const [despesasPendentes, setDepespesasPendentes] = useState<DespesasPendentesType[]|null>(null);
+  const [lancamentosPorCategoria, setLancamentosPorCategoria] = useState<DespesasPorCategoriaType[]|null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -42,6 +43,8 @@ export default function Index() {
     const mes = dataNow.getMonth() + 1;
     const ano = dataNow.getFullYear();
 
+    getLancamentosPorCategoria();
+
     const despesas = await lancamentoRepository.getDespesasPendentes(user.USUARIO_ID, mes, ano);
     setDepespesasPendentes(despesas);
   }
@@ -58,6 +61,16 @@ export default function Index() {
     return ''
   }
   
+  async function getLancamentosPorCategoria(){
+    const lancamentoRepository = new LancamentoRepository();
+
+    const dataNow = new Date();
+    const mes = dataNow.getMonth() + 1;
+    const ano = dataNow.getFullYear();
+    const lancamentos = await lancamentoRepository.getLancamentosPorCategoria(user.USUARIO_ID, mes, ano);
+
+    setLancamentosPorCategoria(lancamentos);
+  }
   
   return (
     <>
@@ -79,7 +92,7 @@ export default function Index() {
             horizontal
           >
             <ThemedView style={{gap: 15, flexDirection: 'row'}}>
-            {despesasPendentes ?
+            {(despesasPendentes != undefined) && (despesasPendentes.length > 0) ?
               despesasPendentes.map( (despesa, i) => {
                 return (
                   <ThemedView key={i} style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150}}>
@@ -94,6 +107,29 @@ export default function Index() {
             </ThemedView> 
           </ScrollView>
 
+        </ThemedView>
+
+        <ThemedView style={{padding: 12,backgroundColor: backgroundSoft}}>
+          <ThemedText type='subtitle'>Gastos por categoria</ThemedText>
+
+          <ThemedView style={{gap: 10, paddingVertical: 10}}>
+          {lancamentosPorCategoria ?
+            lancamentosPorCategoria.map((categoria, i) => {
+              return (
+                <ThemedView key={i} style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12}}>
+                  <ThemedText>{categoria.categoria}</ThemedText>
+                  <ThemedText>{categoria.valorFormatado}</ThemedText>
+                </ThemedView>
+            )})
+            :
+              <></>
+          }
+          </ThemedView>
+
+          <ThemedView style={{flexDirection:'row', justifyContent:'space-between', padding: 12, borderTopWidth: 1, borderColor: 'gray'}}>
+            <ThemedText type='subtitle'>Total</ThemedText>
+            <ThemedText>$10</ThemedText>
+          </ThemedView>
         </ThemedView>
 
         <ThemedView style={{gap: 15}}>

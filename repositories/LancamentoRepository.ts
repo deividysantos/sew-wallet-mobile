@@ -15,6 +15,13 @@ export type DespesasPendentesType = {
     data: Date
 }
 
+export type DespesasPorCategoriaType = {
+    categoria: string,
+    tipo: string,
+    valor: number,
+    valorFormatado: string
+}
+
 export class LancamentoRepository {
 
     async createLancamento (lancamento: Lancamento): Promise<void>  {
@@ -165,6 +172,33 @@ export class LancamentoRepository {
         } finally {
             await statement.finalizeAsync();
         }
+    }
+
+    async getLancamentosPorCategoria(usuario_id: number, mes: number, ano: number){
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+
+        let condicoes = '';
+        
+        if (ano && mes) {
+            const ultimoDiaMes = new Date(ano, mes, 0).toISOString().slice(0, 10);
+            const primeiroDiaMes = new Date(ano, mes-1, 1).toISOString().slice(0, 10);
+
+            condicoes = `   AND L.DATA BETWEEN '${primeiroDiaMes}' AND '${ultimoDiaMes}' `
+        }
+
+        const result = db.getAllAsync<DespesasPorCategoriaType>(`
+            SELECT C.NOME AS categoria,
+                   C.TIPO AS tipo,
+                   SUM(L.VALOR) AS valor,
+                   replace(printf('R$ %.2f', SUM(L.VALOR)), '.', ',') AS valorFormatado
+              FROM LANCAMENTO L
+             INNER JOIN CATEGORIA C ON L.CATEGORIA_ID = C.CATEGORIA_ID
+             WHERE C.USUARIO_ID = ${usuario_id}
+             ${condicoes}
+             GROUP BY C.NOME, C.TIPO
+        `);
+
+        return result;
     }
 
 }
