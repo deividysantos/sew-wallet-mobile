@@ -26,6 +26,7 @@ export default function LancamentosScreen() {
   const text = useThemeColor({}, 'text');
   const backgroundSoft = useThemeColor({}, 'backgroundSoft');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
+  const primaryColor = useThemeColor({}, 'primary')
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -228,8 +229,8 @@ export default function LancamentosScreen() {
                             <ThemedText>{lancamento.VALOR}</ThemedText>
                             <Switch
                               style={{height: 30}}
-                              trackColor={{false: '#767577', true: '#81b0ff'}}
-                              thumbColor={'#81b0ff'}
+                              trackColor={{false: '#ccc', true: primaryColor}}
+                              thumbColor={ lancamento.EFETIVADA == 'Efetivado' ? primaryColor : '#ccc' }
                               onChange={() => {
                                 handleEfetivaLancamento(lancamento.LANCAMENTO_ID);
                               }}
