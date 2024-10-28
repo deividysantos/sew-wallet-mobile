@@ -2,6 +2,7 @@ import { Conta, ContaDescrita, ValidateConta } from "@/types/conta";
 import * as SQLite from 'expo-sqlite';
 
 export type SaldoContaType = {
+    conta_id: number,
     conta: string,
     saldoFormatado: string,
     saldo: number
@@ -72,14 +73,15 @@ export class ContaRepository {
 
         const result = await db.getAllAsync<ContaDescrita>(`
             SELECT C.CONTA_ID,
-                B.NOME AS NOME_BANCO,
-                U.NOME AS NOME_USUARIO,
-                C.NOME AS NOME_CONTA,
-                C.SALDO_INICIAL
-            FROM CONTA C
-            INNER JOIN BANCO B ON B.BANCO_ID = C.BANCO_ID
-            INNER JOIN USUARIO U ON U.USUARIO_ID = C.USUARIO_ID
-            WHERE U.USUARIO_ID = ?
+                   B.NOME AS NOME_BANCO,
+                   U.NOME AS NOME_USUARIO,
+                   C.NOME AS NOME_CONTA,
+                   C.SALDO_INICIAL,
+                   replace(printf('R$ %.2f', C.SALDO_INICIAL), '.', ',') AS SALDO_INICIAL_FORMATADO
+              FROM CONTA C
+             INNER JOIN BANCO B ON B.BANCO_ID = C.BANCO_ID
+             INNER JOIN USUARIO U ON U.USUARIO_ID = C.USUARIO_ID
+             WHERE U.USUARIO_ID = ?
             `, usuario_id
         );
 
@@ -93,7 +95,8 @@ export class ContaRepository {
         
         //Refazer sql
         const result = db.getAllAsync<SaldoContaType>(`
-            SELECT C.NOME AS conta,
+            SELECT C.CONTA_ID AS conta_id,
+                   C.NOME AS conta,
                    replace(printf('R$ %.2f', IFNULL(SUM(CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ),0) + C.SALDO_INICIAL), '.', ',') AS saldoFormatado,
                    IFNULL(SUM( CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ),0) + C.SALDO_INICIAL AS saldo
              FROM CONTA C
@@ -106,7 +109,8 @@ export class ContaRepository {
             
             UNION all
             
-            SELECT C.NOME AS conta,
+            SELECT C.CONTA_ID AS conta_id,
+                   C.NOME AS conta,
                    replace(printf('R$ %.2f', C.SALDO_INICIAL), '.', ',') AS saldoFormatado,
                    C.SALDO_INICIAL AS saldo
              FROM CONTA C

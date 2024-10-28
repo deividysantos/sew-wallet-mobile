@@ -13,6 +13,7 @@ export type ContaDescrita = {
     NOME_USUARIO: string,
     NOME_CONTA: string,
     SALDO_INICIAL: number,
+    SALDO_INICIAL_FORMATADO: string
 };
 
 export const ValidateConta = z.object({

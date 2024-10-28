@@ -95,7 +95,7 @@ export default function Index() {
           {lancamentosPorCategoria ?
             lancamentosPorCategoria.despesas.map((categoria, i) => {
               return (
-                <ThemedView key={i} style={{flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12}}>
+                <ThemedView key={i} style={{flexDirection: 'row', justifyContent: 'space-between' }}>
                   <ThemedText>{categoria.categoria}</ThemedText>
                   <ThemedText>{categoria.valorFormatado}</ThemedText>
                 </ThemedView>
@@ -105,7 +105,7 @@ export default function Index() {
           }
           </ThemedView>
 
-          <ThemedView style={{flexDirection:'row', justifyContent:'space-between', padding: 12, borderTopWidth: 1, borderColor: 'gray'}}>
+          <ThemedView style={{flexDirection:'row', justifyContent:'space-between', paddingTop: 12, borderTopWidth: 1, borderColor: 'gray'}}>
             <ThemedText type='subtitle'>Total</ThemedText>
             <ThemedText>{'R$ ' + lancamentosPorCategoria?.totalDespesas.toFixed(2).replace('.',',')}</ThemedText> 
           </ThemedView>
