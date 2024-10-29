@@ -19,7 +19,7 @@ export default function ContasScreen() {
   const router = useRouter();
   const navigation = useNavigation();
 
-  const [contas, setContas] = useState<{contas: ContaDescrita, saldo: number }[]>([]);
+  const [contas, setContas] = useState< {contas: ContaDescrita, saldo: number }[] >([]);
 
   const { user } = useAuth();
 
@@ -34,16 +34,22 @@ export default function ContasScreen() {
       const saldos = await contaRepository.getSaldoContas(user.USUARIO_ID, new Date());
 
       const contas = await contaRepository.getAllByUser(user?.USUARIO_ID ?? null)
-      
-      const contasSaldo = contas?.filter( (conta) => { conta.CONTA_ID  } ) .map(( conta ) => {
-        const saldo = saldos?.filter( (saldo) => { saldo.conta_id = conta.CONTA_ID } )
 
-        return { conta: conta, saldo: saldo }
+      const contasSaldo = contas?.map(( conta ) => {
+        let saldo = saldos?.filter( (saldo) => { return saldo.conta_id == conta.CONTA_ID } ).reduce( (currentValue: number, actualValue: SaldoContaType ) => {
+          return currentValue + actualValue.saldo
+        }, 0)
+
+        if (!saldo) {
+          saldo = 0;
+        }
+
+        return { contas: conta, saldo: saldo }
       });
 
-      // if (contasSaldo){
-      //   setContas( contasSaldo );
-      // }
+      if (contasSaldo){
+        setContas( contasSaldo );
+      }
     }
 
     fn();
@@ -65,13 +71,7 @@ export default function ContasScreen() {
         const contaRepository = new ContaRepository;
         await contaRepository.deleteConta(conta_id);
   
-        contaRepository
-          .getAllByUser(user?.USUARIO_ID ?? null)
-          .then((contas) => {
-            if (contas){
-              setContas(contas);
-            }                 
-          });
+        atualizaDados()
   
       } catch (error: any) {
         Alert.alert('Erro ao apagar a conta!', error.message, [{text: 'Ok', style: 'cancel'}])
@@ -95,19 +95,18 @@ export default function ContasScreen() {
           data={contas}
           renderItem={(conta) => 
           
-          <View style={{ marginBottom: 15, backgroundColor: backgroundSoft, borderRadius: 5, padding: 15 }}>
-            
+          <View style={{ margin: 10, backgroundColor: backgroundSoft, borderRadius: 5, padding: 15, shadowColor: "#ccc", shadowOffset: { width: 5, height: 3, }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 4 }}>            
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <ThemedText type='subtitle' > { conta.item.NOME_CONTA } </ThemedText>
-              <TouchableOpacity onPress={() => handleDelete(conta.item.CONTA_ID)}>
+              <ThemedText type='subtitle' > { conta.item.contas.NOME_CONTA } </ThemedText>
+              <TouchableOpacity onPress={() => handleDelete(conta.item.contas.CONTA_ID)}>
                 <Ionicons size={20} name="trash" style={{color: '#fff'}} />
               </TouchableOpacity>
             </View> 
 
             <View style={{ paddingHorizontal: 7, paddingVertical: 5, gap: 5 }}>
-              <ThemedText>Banco: {conta.item.NOME_BANCO}</ThemedText>
-              <ThemedText>Saldo inicial: {conta.item.SALDO_INICIAL_FORMATADO}</ThemedText>
-              <ThemedText style={{ fontWeight: '800' }} >Saldo Atual: { getSaldoConta(conta.item.CONTA_ID) } </ThemedText>
+              <ThemedText>Banco: {conta.item.contas.NOME_BANCO}</ThemedText>
+              <ThemedText>Saldo inicial: {conta.item.contas.SALDO_INICIAL_FORMATADO}</ThemedText>
+              <ThemedText style={{ fontWeight: '800' }} >Saldo Atual: { 'R$ ' + conta.item.saldo.toFixed(2).replace('.',',') } </ThemedText>
             </View>
           </View>}
         >

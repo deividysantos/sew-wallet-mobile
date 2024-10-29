@@ -108,7 +108,7 @@ export class LancamentoRepository {
              INNER JOIN CONTA CO ON CO.CONTA_ID = L.CONTA_ID
             WHERE C.USUARIO_ID = ?
             ${condicoes}
-            ORDER BY L.DATA
+            ORDER BY L.DATA DESC
         `, usuario_id);
         
         return result;
