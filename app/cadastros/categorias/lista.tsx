@@ -1,9 +1,10 @@
-import { StyleSheet, StatusBar, SafeAreaView, View, FlatList, TouchableOpacity, Alert} from 'react-native';
+import { StyleSheet, StatusBar, SafeAreaView, View, SectionList, TouchableOpacity, Alert} from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useNavigation, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { AddDownButton } from '@/components/AddDownButton';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 import { CategoriaRepository } from '@/repositories/CategoriaRepository';
 import { useAuth } from '@/contexts/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -18,7 +19,7 @@ export default function CategoriasScreen() {
   const router = useRouter();
   const navigation = useNavigation();
 
-  const [categorias, setCategorias] = useState<CategoriaDescrita[]>([]);
+  const [categorias, setCategorias] = useState<{ title: string, data: string[] }[]>([{ title: '', data: [] }]);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -26,15 +27,29 @@ export default function CategoriasScreen() {
   }, [navigation])
 
   useEffect(() => {
-    const categoriaRepository = new CategoriaRepository;
+    const fn = async () => {
+      const categoriaRepository = new CategoriaRepository;
 
-    categoriaRepository
-      .getAll(user.USUARIO_ID)
-      .then((categorias) => {
-        if (categorias){
-          setCategorias(categorias);
+      const allCat = await categoriaRepository.getAll(user.USUARIO_ID);
+
+      const categorias = [
+        {
+          title: 'Despesas',
+          data: allCat? allCat.filter( (categoria) => { return categoria.TIPO == 'D' } ).map( (categoria) => categoria.CATEGORIA_NOME ) : []
+        },
+        {
+          title: 'Receitas',
+          data: allCat ? allCat.filter(  (categoria) => { return categoria.TIPO == 'R' } ).map( (categoria) => categoria.CATEGORIA_NOME ) : []
         }
-      });
+      ]
+
+      if (categorias) {
+        setCategorias(categorias)
+      }
+    }
+
+    fn()
+    
   }, []);
 
   
@@ -47,17 +62,24 @@ export default function CategoriasScreen() {
             translucent={false}
         /> 
 
-        <FlatList
-          data={categorias}
-          renderItem={(conta) => 
-          <View style={{ marginBottom: 15}}>
-            <View style={{ backgroundColor: primaryColor, flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
-              <ThemedText>{conta.item.CATEGORIA_NOME}</ThemedText>              
-            </View> 
-          </View>}
+        <SectionList
+          sections={categorias}
+          keyExtractor={ (item, index) => item + index }
+
+          renderSectionHeader={({section: { title }}) => (
+          <ThemedText type='subtitle' style={{marginBottom: 5}} >{ title }</ThemedText>
+        )}
+
+          renderItem={( {item} ) => (
+            <ThemedView style={{ marginBottom: 15}}>
+              <ThemedView style={{ backgroundColor: primaryColor, flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderRadius: 5}}>
+                <ThemedText>{ item }</ThemedText>
+              </ThemedView> 
+            </ThemedView>
+          )}
         >
 
-        </FlatList>
+        </SectionList>
         <AddDownButton onPress={() => router.push('/cadastros/categorias/criar')} />
     </SafeAreaView>
   
