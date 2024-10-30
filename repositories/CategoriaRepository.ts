@@ -67,4 +67,25 @@ export class CategoriaRepository {
         return categoria_id;
     }
 
+    async delete(categoria_id: number): Promise<boolean>{
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+
+        const lancamentos = await db.getFirstAsync< { lancamentosVinculados: number } >(`
+            SELECT SUM(L.LANCAMENTO_ID) AS lancamentosVinculados
+              FROM LANCAMENTO L
+             WHERE L.CATEGORIA_ID = ${categoria_id}
+        `);
+
+        if (lancamentos?.lancamentosVinculados) {
+            throw new Error('Existem ' + lancamentos.lancamentosVinculados + ' lançamentos financeiros vinculados a esta categoria!');
+        }
+
+        try {
+            db.execAsync(`DELETE FROM CATEGORIA WHERE CATEGORIA_ID = ${categoria_id}`);
+            return true;
+        } catch (error: any) {
+            throw new Error(error.message);
+        }
+    }
+
 }
