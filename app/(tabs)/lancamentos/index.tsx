@@ -137,6 +137,23 @@ export default function LancamentosScreen() {
     atualizaDados();
   }
 
+  function getDay(dia: string){
+    const dias = [
+      'Domingo',
+      'Segunda Feira',
+      'Terça Feira',
+      'Quarta Feira',
+      'Quinta Feira',
+      'Sexta Feira',
+      'Sábado'
+    ]
+    const data = stringToDate(dia)
+    const diaIndex = data.getDay() - 1
+
+    return dias[diaIndex] + ', ' + data.toLocaleString('pt-br').substring(0, 5);
+
+  }
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }}/>
@@ -208,7 +225,7 @@ export default function LancamentosScreen() {
           }).map((dia) => {
           return (
             <ThemedView key={dia} style={{marginBottom: 20, padding: 10}}>
-              <ThemedText style={{ fontSize: 18, borderTopWidth: 1, borderColor: 'gray' }}>{dia}</ThemedText>
+              <ThemedText style={{ fontSize: 18, borderTopWidth: 1, borderColor: 'gray' }}> { getDay(dia) } </ThemedText>
               <ThemedView style={{gap: 15}}>
                 {lancamentos.filter((lancamento) => {return dia == new Date(lancamento.DATA).toLocaleDateString('pt-br') }).map((lancamento) => {
                   return ( 
