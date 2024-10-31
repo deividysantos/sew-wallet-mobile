@@ -88,8 +88,15 @@ export default function Index() {
         <ScrollView>
           <DespesasPendentes usuario_id={user.USUARIO_ID} mes={mesAtual.mes} ano={mesAtual.ano} key={key}/>
 
-          <ThemedView style={{padding: 12,backgroundColor: backgroundSoft}}>
-            <ThemedText type='subtitle'>Gastos por categoria</ThemedText>
+          <ThemedView style={{padding: 12,backgroundColor: backgroundSoft, margin: 10, borderRadius: 5}}>
+            <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <ThemedText type='subtitle'>Gastos por categoria</ThemedText>
+              <TouchableOpacity onPress={() => {
+                router.push('/cadastros/categorias/criar')
+              }}>
+                <Ionicons name='add' size={30} color={text} />
+              </TouchableOpacity>
+            </ThemedView>
 
             <ThemedView style={{gap: 10, paddingVertical: 10}}>
             {lancamentosPorCategoria ?
@@ -111,41 +118,35 @@ export default function Index() {
             </ThemedView>
           </ThemedView>
 
-          <ThemedView style={{gap: 15}}>
-
-            <ThemedView style={{ padding: 15, backgroundColor: backgroundSoft, marginTop: 10, borderTopLeftRadius: 10, borderTopRightRadius: 10 }}>
-              <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <ThemedText type='subtitle'>Saldo em contas </ThemedText>
-                <TouchableOpacity onPress={() => {
-                  router.push('/cadastros/contas/criar')
-                }}>
-                  <Ionicons name='add' size={30} color={text} />
-                </TouchableOpacity>
-              </ThemedView>
-
-              <ThemedView >
-                {saldoContas?.map( (saldo, i) => {
-                  return (
-                    <ThemedView key={i} style={{flexDirection: 'row', marginVertical: 5, justifyContent: 'space-between'}}>
-                      <ThemedText>
-                        {saldo.conta} 
-                      </ThemedText>
-                      <ThemedText>
-                        {saldo.saldoFormatado}
-                      </ThemedText>
-                    </ThemedView>
-                  )
-                })}
-              </ThemedView>
-
-              <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, marginTop: 10, borderTopColor: 'gray', paddingTop: 15}}>
-                <ThemedText type='subtitle'>Total</ThemedText>
-                <ThemedText> {getTotalSaldoContas()} </ThemedText>
-              </ThemedView>
+          <ThemedView style={{ padding: 15, backgroundColor: backgroundSoft, marginTop: 10, borderRadius: 10, margin: 10 }}>
+            <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+              <ThemedText type='subtitle'>Saldo em contas </ThemedText>
+              <TouchableOpacity onPress={() => {
+                router.push('/cadastros/contas/criar')
+              }}>
+                <Ionicons name='add' size={30} color={text} />
+              </TouchableOpacity>
             </ThemedView>
-            
 
+            <ThemedView >
+              {saldoContas?.map( (saldo, i) => {
+                return (
+                  <ThemedView key={i} style={{flexDirection: 'row', marginVertical: 5, justifyContent: 'space-between'}}>
+                    <ThemedText>
+                      {saldo.conta} 
+                    </ThemedText>
+                    <ThemedText>
+                      {saldo.saldoFormatado}
+                    </ThemedText>
+                  </ThemedView>
+                )
+              })}
+            </ThemedView>
 
+            <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, marginTop: 10, borderTopColor: 'gray', paddingTop: 15}}>
+              <ThemedText type='subtitle'>Total</ThemedText>
+              <ThemedText> {getTotalSaldoContas()} </ThemedText>
+            </ThemedView>
           </ThemedView>
         </ScrollView>
       </SafeAreaView>
