@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity, Modal, Keyboard, Alert } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Modal, Keyboard, Alert, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import BottomSheet from "@gorhom/bottom-sheet";
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -53,6 +53,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
   const text = useThemeColor({}, 'text');
   const backgroundSoft = useThemeColor({}, 'backgroundSoft');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
+  const primaryColor = useThemeColor({}, 'primary');
 
   const [tipoLancamento, setTipoLancamento] = useState('');
   useEffect(() => {
@@ -204,8 +205,19 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
         {tipoLancamento === 'R' && <>
             <TouchableOpacity  style={[styles.receber, {backgroundColor: backgroundSoft}]} activeOpacity={1}>
               
-              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <ThemedText type='subtitle' style={{marginBottom: 10}}> Receita </ThemedText>
+              <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <ThemedText type='subtitle' style={{marginBottom: 10}}> Receita </ThemedText>
+                  <Switch 
+                    style={{height: 30}}
+                    trackColor={{false: '#ccc', true: primaryColor}}
+                    thumbColor={ formulario.EFETIVADA == 'S' ? primaryColor : '#ccc' }
+                    onChange={() => {
+                      setFomulario( (prev) => ( {...prev, EFETIVADA: formulario.EFETIVADA == 'S' ? 'N' : 'S'} ) )
+                    }}
+                    value={ formulario.EFETIVADA == 'S' }
+                  />
+                </ThemedView>
                 <TouchableOpacity
                   onPress={() => { Close() }}
                 >
@@ -269,7 +281,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                     showSoftInputOnFocus={false}
                   />
                 </View>
-              </View>           
+              </View>
 
               <ThemedText> Descrição </ThemedText>
               <ThemedTextInput 
@@ -321,7 +333,18 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
             <TouchableOpacity  style={[styles.receber, {backgroundColor: backgroundSoft}]} activeOpacity={1}>
               
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                <ThemedText type='subtitle' style={{marginBottom: 10}}> Despesa </ThemedText>
+                <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
+                  <ThemedText type='subtitle' style={{marginBottom: 10}}> Despesa </ThemedText>
+                  <Switch 
+                      style={{height: 30}}
+                      trackColor={{false: '#ccc', true: primaryColor}}
+                      thumbColor={ formulario.EFETIVADA == 'S' ? primaryColor : '#ccc' }
+                      onChange={() => {
+                        setFomulario( (prev) => ( {...prev, EFETIVADA: formulario.EFETIVADA == 'S' ? 'N' : 'S'} ) )
+                      }}
+                      value={ formulario.EFETIVADA == 'S' }
+                    />
+                </ThemedView>
                 <TouchableOpacity
                   onPress={() => { Close() }}
                 >
