@@ -88,7 +88,7 @@ export default function Index() {
         <ScrollView>
           <DespesasPendentes usuario_id={user.USUARIO_ID} mes={mesAtual.mes} ano={mesAtual.ano} key={key}/>
 
-          <ThemedView style={{padding: 12,backgroundColor: backgroundSoft, margin: 10, borderRadius: 5}}>
+          <ThemedView style={{padding: 12,backgroundColor: backgroundSoft, margin: 10, borderRadius: 5, shadowColor: "#ccc", shadowOffset: { width: 5, height: 3, }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 4 }}>
             <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <ThemedText type='subtitle'>Gastos por categoria</ThemedText>
               <TouchableOpacity onPress={() => {
@@ -118,7 +118,7 @@ export default function Index() {
             </ThemedView>
           </ThemedView>
 
-          <ThemedView style={{ padding: 15, backgroundColor: backgroundSoft, marginTop: 10, borderRadius: 10, margin: 10 }}>
+          <ThemedView style={{ padding: 15, backgroundColor: backgroundSoft, marginTop: 10, borderRadius: 10, margin: 10, shadowColor: "#ccc", shadowOffset: { width: 5, height: 3, }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 4 }}>
             <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <ThemedText type='subtitle'>Saldo em contas </ThemedText>
               <TouchableOpacity onPress={() => {

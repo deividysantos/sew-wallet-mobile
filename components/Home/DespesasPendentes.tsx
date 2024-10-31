@@ -56,10 +56,10 @@ export default function DespesasPendentes ( { usuario_id, mes, ano }: DespesasPe
                 {(despesasPendentes != undefined) && (despesasPendentes.length > 0) ?
                     despesasPendentes.map( (despesa, i) => {
                     return (
-                        <ThemedView key={i} style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150}}>
-                        <ThemedText>{despesa.nome}</ThemedText>
-                        <ThemedText style={{color: 'red'}}>{despesa.valorFormatado}</ThemedText>
-                        <ThemedText>{ new Date(despesa.data).toLocaleDateString('pt-br') }</ThemedText>
+                        <ThemedView key={i} style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150, shadowColor: "#ccc", shadowOffset: { width: 5, height: 3, }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 4 }}>
+                            <ThemedText>{despesa.nome}</ThemedText>
+                            <ThemedText style={{color: 'red'}}>{despesa.valorFormatado}</ThemedText>
+                            <ThemedText>{ new Date(despesa.data).toLocaleDateString('pt-br') }</ThemedText>
                         </ThemedView>
                     )
                     } ) :
