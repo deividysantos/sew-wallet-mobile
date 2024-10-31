@@ -249,6 +249,16 @@ export default function LancamentosScreen() {
                               trackColor={{false: '#ccc', true: primaryColor}}
                               thumbColor={ lancamento.EFETIVADA == 'Efetivado' ? primaryColor : '#ccc' }
                               onChange={() => {
+                                
+                                setLancamentos(lancamentos.map((lancamentoAtual) => {
+                                  
+                                  if (lancamentoAtual.LANCAMENTO_ID == lancamento.LANCAMENTO_ID){
+                                    lancamentoAtual.EFETIVADA = lancamentoAtual.EFETIVADA == 'Efetivado' ? 'Pendente' : 'Efetivado'
+                                  }
+
+                                  return lancamentoAtual
+                                }))
+
                                 handleEfetivaLancamento(lancamento.LANCAMENTO_ID);
                               }}
                               value={ lancamento.EFETIVADA == 'Efetivado' }
