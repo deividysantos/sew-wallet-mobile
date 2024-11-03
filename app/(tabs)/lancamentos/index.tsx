@@ -1,5 +1,5 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useDebugValue } from 'react';
 import { StyleSheet, StatusBar, SafeAreaView, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useAuth } from '@/contexts/AuthContext';
@@ -15,7 +15,7 @@ import  LancamentosCreateModal  from '@/app/(tabs)/lancamentos/criar'
 import { useNavigation, useRouter, Stack } from 'expo-router';
 import { LancamentoRepository, InfoMesType } from '@/repositories/LancamentoRepository';
 import { LancamentoDescrito } from '@/types/lancamentos';
-import { ContaRepository, SaldoContaType } from '@/repositories/ContaRespoitory';
+import { ContaRepository, SaldoContaType, SaldoFuturoType } from '@/repositories/ContaRespoitory';
 
 import { stringToDate } from '@/utils/dateUtils';
 
@@ -51,7 +51,7 @@ export default function LancamentosScreen() {
   const [modal, setModal] = useState(false);
   const [mesSelecionado, setMesSelecionado] = useState<number>( new Date().getMonth() );
   const [infoMes, SetInfoMes] = useState<InfoMesType|null>();
-  const [diasComLancamentos, setDiasComLancamentos] = useState<string[]>([]);
+  const [diasComLancamentos, setDiasComLancamentos] = useState<{dia: string, saldo: string}[]>([]);
   const [lancamentos, setLancamentos] = useState<LancamentoDescrito[]>([]);
 
   useFocusEffect(
@@ -104,6 +104,7 @@ export default function LancamentosScreen() {
   async function atualizaDados(){
 
     const lancamentoRepository = new LancamentoRepository();
+    const contaRepository = new ContaRepository();
 
     try {
       const result =  await lancamentoRepository.getAllByUser(user.USUARIO_ID);
@@ -119,11 +120,22 @@ export default function LancamentosScreen() {
       dias = dias.filter(function(este, i) {
         return dias.indexOf(este) === i;
       });
-      
-      setDiasComLancamentos(dias.map((dia) => {
-        return new Date(dia).toLocaleDateString('pt-br')
-      }));
 
+      const diasSomados = await Promise.all(
+        dias.map(async (dia) => {
+          let diaStr = new Date(dia).toLocaleDateString('pt-br');
+          
+          let saldoDia = await contaRepository.getSaldoFuturo(user.USUARIO_ID, undefined, dia);
+          
+          let saldoDiaSomado = saldoDia.reduce((accumulator: number, currentValue: SaldoFuturoType) => {
+            return accumulator + currentValue.saldo;
+          }, 0);
+          
+          return { dia: diaStr, saldo: saldoDiaSomado.toFixed(2) };
+        })
+      );
+      
+      setDiasComLancamentos(diasSomados);
       setLancamentos(result);
       getInfo();
     } catch (e:any){
@@ -221,13 +233,13 @@ export default function LancamentosScreen() {
 
         <ScrollView>
           {diasComLancamentos.filter((dia) => {
-            return stringToDate(dia).getMonth() == mesSelecionado
+            return stringToDate(dia.dia).getMonth() == mesSelecionado
           }).map((dia) => {
           return (
-            <ThemedView key={dia} style={{marginBottom: 20, padding: 10}}>
-              <ThemedText style={{ fontSize: 18, borderTopWidth: 1, borderColor: 'gray' }}> { getDay(dia) } </ThemedText>
+            <ThemedView key={dia.dia} style={{marginBottom: 20, padding: 10}}>
+              <ThemedText style={{ fontSize: 18, borderTopWidth: 1, borderColor: 'gray' }}> { getDay(dia.dia) } </ThemedText>
               <ThemedView style={{gap: 15}}>
-                {lancamentos.filter((lancamento) => {return dia == new Date(lancamento.DATA).toLocaleDateString('pt-br') }).map((lancamento) => {
+                {lancamentos.filter((lancamento) => {return dia.dia == new Date(lancamento.DATA).toLocaleDateString('pt-br') }).map((lancamento) => {
                   return ( 
                     <ThemedView key={lancamento.TITULO}  style={{borderLeftWidth: 2, borderColor: lancamento.TIPO == 'Débito' ? 'red' : 'green' }}>
                       <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
@@ -271,7 +283,7 @@ export default function LancamentosScreen() {
               </ThemedView>
               <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'rgba(94, 108, 121, 0.2)', padding: 5, marginTop: 8, borderRadius: 3}}>
                 <ThemedText>Valor no dia</ThemedText>
-                <ThemedText>$150,00</ThemedText>
+                <ThemedText>$ {dia.saldo} </ThemedText>
               </ThemedView>
             </ThemedView>
           )
