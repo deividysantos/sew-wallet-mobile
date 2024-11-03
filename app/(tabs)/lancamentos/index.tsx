@@ -131,7 +131,7 @@ export default function LancamentosScreen() {
             return accumulator + currentValue.saldo;
           }, 0);
           
-          return { dia: diaStr, saldo: saldoDiaSomado.toFixed(2) };
+          return { dia: diaStr, saldo: saldoDiaSomado.toFixed(2).replace('.',',') };
         })
       );
       
@@ -283,7 +283,7 @@ export default function LancamentosScreen() {
               </ThemedView>
               <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'rgba(94, 108, 121, 0.2)', padding: 5, marginTop: 8, borderRadius: 3}}>
                 <ThemedText>Valor no dia</ThemedText>
-                <ThemedText>$ {dia.saldo} </ThemedText>
+                <ThemedText>R$ {dia.saldo} </ThemedText>
               </ThemedView>
             </ThemedView>
           )

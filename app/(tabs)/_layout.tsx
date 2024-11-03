@@ -12,6 +12,11 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarStyle: {
+          backgroundColor: Colors[colorScheme ?? 'light'].backgroundHard,
+          borderTopWidth: 0,
+          borderColor: Colors[colorScheme ?? 'light'].backgroundHard,
+        },
         headerShown: false,
       }}
       initialRouteName="home"
