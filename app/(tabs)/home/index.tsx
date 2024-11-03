@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ContaRepository, SaldoContaType } from '@/repositories/ContaRespoitory';
 import { LancamentoRepository, DespesasPorCategoriaType } from '@/repositories/LancamentoRepository';
 import DespesasPendentes from '@/components/Home/DespesasPendentes';
+import { formatCurrency } from '@/utils/currency';
 
 export default function Index() {
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function Index() {
     }, 0)
 
     if (total) {
-      return 'R$ ' + total.toFixed(2).replace('.',',')
+      return formatCurrency(total, 'BRL')
     }
 
     return ''
@@ -104,7 +105,7 @@ export default function Index() {
                 return (
                   <ThemedView key={i} style={{flexDirection: 'row', justifyContent: 'space-between' }}>
                     <ThemedText>{categoria.categoria}</ThemedText>
-                    <ThemedText>{categoria.valorFormatado}</ThemedText>
+                    <ThemedText> { formatCurrency(categoria.valor, 'BRL') } </ThemedText>
                   </ThemedView>
               )})
               :
@@ -114,7 +115,7 @@ export default function Index() {
 
             <ThemedView style={{flexDirection:'row', justifyContent:'space-between', paddingTop: 12, borderTopWidth: 1, borderColor: 'gray'}}>
               <ThemedText type='subtitle'>Total</ThemedText>
-              <ThemedText>{'R$ ' + lancamentosPorCategoria?.totalDespesas.toFixed(2).replace('.',',')}</ThemedText> 
+              <ThemedText>{ formatCurrency(lancamentosPorCategoria?.totalDespesas, 'BRL')}</ThemedText> 
             </ThemedView>
           </ThemedView>
 
@@ -136,7 +137,7 @@ export default function Index() {
                       {saldo.conta} 
                     </ThemedText>
                     <ThemedText>
-                      {saldo.saldoFormatado}
+                      { formatCurrency(saldo.saldo, 'BRL') }
                     </ThemedText>
                   </ThemedView>
                 )

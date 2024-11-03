@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
 import { getLastDayOfCurrentMonth } from '../../../utils/dateUtils'
+import { formatCurrency } from '@/utils/currency';
 
 export default function ContasScreen() {
   const backgroundHard = useThemeColor({}, 'backgroundHard');
@@ -124,9 +125,9 @@ export default function ContasScreen() {
 
             <View style={{ paddingHorizontal: 7, paddingVertical: 5, gap: 5 }}>
               <ThemedText>Banco: {conta.item.contas.NOME_BANCO}</ThemedText>
-              <ThemedText>Saldo inicial: {conta.item.contas.SALDO_INICIAL_FORMATADO}</ThemedText>
-              <ThemedText style={{ fontWeight: '800' }} >Saldo Atual: { 'R$ ' + conta.item.saldo.toFixed(2).replace('.',',') } </ThemedText>
-              <ThemedText style={{ fontWeight: '800' }} >Saldo Futuro: { 'R$ ' + conta.item.saldoFuturo.toFixed(2).replace('.',',') } </ThemedText>
+              <ThemedText>Saldo inicial: { formatCurrency(conta.item.contas.SALDO_INICIAL, 'BRL') } </ThemedText>
+              <ThemedText style={{ fontWeight: '800' }} >Saldo Atual: { formatCurrency(conta.item.saldo, 'BRL') } </ThemedText>
+              <ThemedText style={{ fontWeight: '800' }} >Saldo Futuro: { formatCurrency(conta.item.saldoFuturo, 'BRL') } </ThemedText>
             </View>
           </View>}
         >

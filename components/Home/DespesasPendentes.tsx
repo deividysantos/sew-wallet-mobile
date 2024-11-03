@@ -6,6 +6,7 @@ import { ThemedView } from "../ThemedView"
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 import { LancamentoRepository, DespesasPendentesType } from "@/repositories/LancamentoRepository";
+import { formatCurrency } from "@/utils/currency";
 
 export type DespesasPendentesProps = {
     usuario_id: number,
@@ -58,7 +59,7 @@ export default function DespesasPendentes ( { usuario_id, mes, ano }: DespesasPe
                     return (
                         <ThemedView key={i} style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150, shadowColor: "#ccc", shadowOffset: { width: 5, height: 3, }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 4 }}>
                             <ThemedText>{despesa.nome}</ThemedText>
-                            <ThemedText style={{color: 'red'}}>{despesa.valorFormatado}</ThemedText>
+                            <ThemedText style={{color: 'red'}}>{ formatCurrency(despesa.valor, 'BRL') }</ThemedText>
                             <ThemedText>{ new Date(despesa.data).toLocaleDateString('pt-br') }</ThemedText>
                         </ThemedView>
                     )

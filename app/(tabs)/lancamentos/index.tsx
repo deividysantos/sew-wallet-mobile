@@ -18,6 +18,7 @@ import { LancamentoDescrito } from '@/types/lancamentos';
 import { ContaRepository, SaldoContaType, SaldoFuturoType } from '@/repositories/ContaRespoitory';
 
 import { stringToDate } from '@/utils/dateUtils';
+import { formatCurrency } from '@/utils/currency';
 
 export default function LancamentosScreen() {
   const router = useRouter();
@@ -131,7 +132,7 @@ export default function LancamentosScreen() {
             return accumulator + currentValue.saldo;
           }, 0);
           
-          return { dia: diaStr, saldo: saldoDiaSomado.toFixed(2).replace('.',',') };
+          return { dia: diaStr, saldo: formatCurrency(saldoDiaSomado,'BRL') };
         })
       );
       
@@ -202,30 +203,21 @@ export default function LancamentosScreen() {
             <ThemedView style={{flex: 1, alignItems: 'flex-start'}}>
               <ThemedText style={{color: text}} >Entradas</ThemedText>
               <ThemedText style={{color: text}}>
-                {infoMes?.entradas ?
-                  <> {infoMes.entradas}</> :
-                  <> 0</>
-                }
+                {formatCurrency(infoMes?.entradas, 'BRL')}
               </ThemedText>
             </ThemedView>
 
             <ThemedView style={{flex: 1, alignItems: 'center'}}>
               <ThemedText>Balanço</ThemedText>
               <ThemedText>
-                {infoMes?.balanco ? 
-                  <> {infoMes.balanco}</> :
-                  <> </>
-                }
+                {formatCurrency(infoMes?.balanco, 'BRL')}
               </ThemedText>
             </ThemedView>
 
             <ThemedView style={{flex: 1, alignItems: 'flex-end'}}>
               <ThemedText>Saidas</ThemedText>
               <ThemedText>
-                {infoMes?.saidas ? 
-                  <> {infoMes.saidas}</> :
-                  <> 0</>
-                }
+                {formatCurrency(infoMes?.saidas, 'BRL')}
               </ThemedText>
             </ThemedView>
           </ThemedView>
@@ -255,7 +247,7 @@ export default function LancamentosScreen() {
                           </ThemedView>
                           
                           <ThemedView style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
-                            <ThemedText>{lancamento.VALOR}</ThemedText>
+                            <ThemedText>{formatCurrency(lancamento.VALOR, 'BRL')}</ThemedText>
                             <Switch
                               style={{height: 30}}
                               trackColor={{false: '#ccc', true: primaryColor}}
@@ -283,7 +275,7 @@ export default function LancamentosScreen() {
               </ThemedView>
               <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between', backgroundColor: 'rgba(94, 108, 121, 0.2)', padding: 5, marginTop: 8, borderRadius: 3}}>
                 <ThemedText>Valor no dia</ThemedText>
-                <ThemedText>R$ {dia.saldo} </ThemedText>
+                <ThemedText> { dia.saldo } </ThemedText>
               </ThemedView>
             </ThemedView>
           )

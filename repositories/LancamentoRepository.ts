@@ -96,7 +96,7 @@ export class LancamentoRepository {
                      WHEN C.TIPO = 'R' THEN 'Crédito'
                      WHEN C.TIPO = 'D' THEN 'Débito'
                    END TIPO,
-                   replace(printf('R$ %.2f', L.VALOR), '.', ',') AS VALOR,
+                   L.VALOR AS VALOR,
                    CASE
                      WHEN L.EFETIVADA = 'S' THEN 'Efetivado'
                      ELSE 'Pendente'
@@ -121,9 +121,9 @@ export class LancamentoRepository {
         const primeiroDiaMes = new Date(ano, mes-1, 1).toISOString().slice(0, 10);
 
         const result = db.getFirstAsync<InfoMesType>(`
-            SELECT replace(printf('R$ %.2f', SUM( CASE WHEN C.TIPO = 'R' THEN 1 ELSE 0 END * L.VALOR )), '.', ',') AS entradas,
-                   replace(printf('R$ %.2f', SUM( CASE WHEN C.TIPO = 'D' THEN 1 ELSE 0 END * L.VALOR )), '.', ',') AS saidas,
-                   replace(printf('R$ %.2f', SUM( CASE WHEN C.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END )), '.', ',') AS balanco
+            SELECT SUM(CASE WHEN C.TIPO = 'R' THEN 1 ELSE 0 END * L.VALOR) AS entradas,
+                   SUM(CASE WHEN C.TIPO = 'D' THEN 1 ELSE 0 END * L.VALOR) AS saidas,
+                   SUM(CASE WHEN C.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END) AS balanco
              FROM LANCAMENTO L
             INNER JOIN CATEGORIA C ON C.CATEGORIA_ID = L.CATEGORIA_ID
             WHERE C.USUARIO_ID = ${usuario_id}

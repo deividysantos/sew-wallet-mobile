@@ -18,7 +18,7 @@ import { ContaRepository } from '@/repositories/ContaRespoitory';
 import { LancamentoRepository } from '@/repositories/LancamentoRepository';
 import { CategoriaRepository } from '@/repositories/CategoriaRepository';
 import { ParametroRepository } from '@/repositories/ParametroRepository';
-
+import { formatCurrency } from '@/utils/currency';
 export type LancamentosCreateModal = {
   visible: boolean,
   setVisible: (e:boolean) => void,
@@ -212,7 +212,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
     const formattedNumber = parseFloat(formattedText)
 
     if (!isNaN(formattedNumber)){
-      setValorString(formattedNumber.toFixed(2).replace('.',','))
+      setValorString( formatCurrency(formattedNumber, 'BRL') )
       setFomulario( (prev) => ({...prev, VALOR: formattedNumber}) )
     } else {
       setValorString('0');
