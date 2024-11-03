@@ -44,6 +44,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
     setFomulario(LancamentoZerado);
     setExibeLookUpCategorias(false);
     setCategoriaSelecionada(null);
+    setValorString('0');
     onClose();
   }
 
@@ -66,6 +67,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
   }, [tipoLancamento]);
 
   const [ formulario, setFomulario ] = useState<Lancamento>(LancamentoZerado);
+  const [ valorString, setValorString ] = useState<string>('0');
 
   const sheetRefConta = useRef<BottomSheet>(null);
   const [contas, setContas] = useState<FieldResult[]|null>(null);
@@ -159,6 +161,25 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
     
     Close();
   }
+
+  function handleExitValue(){
+    
+    let formattedText = valorString.replace('.', '').replace(',','.').replace(/[^0-9.]/g, '');
+    if ((formattedText.match(/\./g) || []).length > 1) {
+      formattedText = formattedText.slice(0, -1);
+    }
+
+    const formattedNumber = parseFloat(formattedText)
+
+    if (!isNaN(formattedNumber)){
+      setValorString(formattedNumber.toFixed(2).replace('.',','))
+      setFomulario( (prev) => ({...prev, VALOR: formattedNumber}) )
+    } else {
+      setValorString('0');
+      setFomulario( (prev) => ({...prev, VALOR: 0}) )
+    }
+    
+  }
   
   return (
     <Modal
@@ -239,8 +260,9 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                   <ThemedTextInput 
                     keyboardType = 'numeric'
                     style={{marginBottom: 7}}
-                    value={ formulario.VALOR.toString() }
-                    onChangeText={ (novoValor => setFomulario( (prev) => ({...prev, VALOR: parseFloat(novoValor ? novoValor : '0')}) )) }
+                    value={ valorString }
+                    onChangeText={ (value) => setValorString(value) }
+                    onBlur={ handleExitValue }
                   />
                 </View>
 
@@ -366,8 +388,9 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                   <ThemedTextInput 
                     keyboardType = 'numeric'
                     style={{marginBottom: 7, borderColor: 'red'}}
-                    value={formulario.VALOR.toString()}
-                    onChangeText={ (novoValor => setFomulario( (prev) => ({...prev, VALOR: parseFloat(novoValor ? novoValor : '0')}) )) }
+                    value={ valorString }
+                    onChangeText={ (value) => setValorString(value) }
+                    onBlur={ handleExitValue }
                   />
                 </View>
 
