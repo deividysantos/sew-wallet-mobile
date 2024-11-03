@@ -5,10 +5,11 @@ import { useEffect, useState, useCallback  } from 'react';
 import { AddDownButton } from '@/components/AddDownButton';
 import { ThemedText } from '@/components/ThemedText';
 import { ContaDescrita } from '@/types/conta';
-import { ContaRepository, SaldoContaType } from '@/repositories/ContaRespoitory';
+import { ContaRepository, SaldoContaType, SaldoFuturoType } from '@/repositories/ContaRespoitory';
 import { useAuth } from '@/contexts/AuthContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from '@react-navigation/native';
+import { getLastDayOfCurrentMonth } from '../../../utils/dateUtils'
 
 export default function ContasScreen() {
   const backgroundHard = useThemeColor({}, 'backgroundHard');
@@ -19,7 +20,7 @@ export default function ContasScreen() {
   const router = useRouter();
   const navigation = useNavigation();
 
-  const [contas, setContas] = useState< {contas: ContaDescrita, saldo: number }[] >([]);
+  const [contas, setContas] = useState< {contas: ContaDescrita, saldo: number, saldoFuturo: number }[] >([]);
 
   const { user } = useAuth();
 
@@ -31,20 +32,38 @@ export default function ContasScreen() {
     const fn = async () => {
       
       const contaRepository = new ContaRepository;
-      const saldos = await contaRepository.getSaldoContas(user.USUARIO_ID, new Date());
-
-      const contas = await contaRepository.getAllByUser(user?.USUARIO_ID ?? null)
+      const [saldos, contas, saldosFuturos] = await Promise.all([
+        contaRepository.getSaldoContas(user.USUARIO_ID, new Date()),
+        contaRepository.getAllByUser(user.USUARIO_ID),
+        contaRepository.getSaldoFuturo(user.USUARIO_ID, undefined, getLastDayOfCurrentMonth())
+      ]);
 
       const contasSaldo = contas?.map(( conta ) => {
-        let saldo = saldos?.filter( (saldo) => { return saldo.conta_id == conta.CONTA_ID } ).reduce( (currentValue: number, actualValue: SaldoContaType ) => {
-          return currentValue + actualValue.saldo
-        }, 0)
+        let saldo = saldos
+          ?.filter( (saldo) => { 
+              return saldo.conta_id == conta.CONTA_ID 
+          })
+          .reduce( (currentValue: number, actualValue: SaldoContaType ) => {
+            return currentValue + actualValue.saldo
+          }, 0)
 
         if (!saldo) {
           saldo = 0;
         }
 
-        return { contas: conta, saldo: saldo }
+        let saldoFuturo = saldosFuturos
+          ?.filter((saldoFuturo) => {
+            return saldoFuturo.conta_id = conta.CONTA_ID
+          })
+          .reduce( (currentValue: number, actualValue: SaldoFuturoType) => {
+            return currentValue + actualValue.saldo
+          }, 0)
+
+          if (!saldoFuturo) {
+            saldoFuturo = 0
+          }
+ 
+        return { contas: conta, saldo: saldo,saldoFuturo: saldoFuturo }
       });
 
       if (contasSaldo){
@@ -107,6 +126,7 @@ export default function ContasScreen() {
               <ThemedText>Banco: {conta.item.contas.NOME_BANCO}</ThemedText>
               <ThemedText>Saldo inicial: {conta.item.contas.SALDO_INICIAL_FORMATADO}</ThemedText>
               <ThemedText style={{ fontWeight: '800' }} >Saldo Atual: { 'R$ ' + conta.item.saldo.toFixed(2).replace('.',',') } </ThemedText>
+              <ThemedText style={{ fontWeight: '800' }} >Saldo Futuro: { 'R$ ' + conta.item.saldoFuturo.toFixed(2).replace('.',',') } </ThemedText>
             </View>
           </View>}
         >

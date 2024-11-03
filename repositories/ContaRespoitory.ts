@@ -8,6 +8,12 @@ export type SaldoContaType = {
     saldo: number
 }
 
+export type SaldoFuturoType = {
+    conta_id: number, 
+    saldo: number, 
+    saldoFormatado: string
+}
+
 export class ContaRepository {
 
     async createConta (conta : Conta): Promise<number|null>  {
@@ -123,6 +129,33 @@ export class ContaRepository {
         `);
 
         return result;
+    }
+
+    async getSaldoFuturo(usuario_id: number, conta_id?: number, data?: Date): Promise<SaldoFuturoType[]>{
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+
+        var filtros = '';
+        if (data){
+            const diaVerificacao = new Date(data).toISOString().slice(0, 10);
+            filtros += `   AND L.DATA <=  '${diaVerificacao}'`
+        }
+
+        if (conta_id){
+            filtros += `   AND C.CONTA_ID = ${conta_id}`
+        }
+
+        const result = db.getAllAsync<SaldoFuturoType>(`
+            SELECT C.CONTA_ID AS conta_id,
+                   IFNULL(SUM( CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ),0) + C.SALDO_INICIAL AS saldo,
+                   replace(printf('R$ %.2f', IFNULL(SUM(CASE WHEN CAT.TIPO = 'R' THEN L.VALOR ELSE -L.VALOR END ),0) + C.SALDO_INICIAL), '.', ',') AS saldoFormatado
+              FROM CONTA C
+             INNER JOIN LANCAMENTO L ON L.CONTA_ID = C.CONTA_ID
+             INNER JOIN CATEGORIA CAT ON CAT.CATEGORIA_ID = L.CATEGORIA_ID
+             WHERE C.USUARIO_ID = ${usuario_id}
+             ${filtros}
+        `)
+
+        return result
     }
 
 }
