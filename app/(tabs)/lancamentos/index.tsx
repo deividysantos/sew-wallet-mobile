@@ -160,7 +160,7 @@ export default function LancamentosScreen() {
       'Sábado'
     ]
     const data = stringToDate(dia)
-    const diaIndex = data.getDay() - 1
+    const diaIndex = data.getDay()
 
     return dias[diaIndex] + ', ' + data.toLocaleString('pt-br').substring(0, 5);
 

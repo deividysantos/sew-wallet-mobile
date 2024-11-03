@@ -202,4 +202,25 @@ export class LancamentoRepository {
         return result;
     }
 
+    async getMediaPorCategoria(usuario_id: number , categoria_id: number): Promise<number> {
+        const db = await SQLite.openDatabaseAsync('sew-wallet.db');
+        
+        const result = await db.getFirstAsync<{valorMedio: number, qtde: number}>(`
+            SELECT AVG(L.VALOR) AS valorMedio,
+                   SUM(L.LANCAMENTO_ID) AS qtde
+              FROM LANCAMENTO L
+             WHERE L.CATEGORIA_ID = ${categoria_id}
+        `)
+
+        if (!result){
+            throw new Error('Não foi encontrado valor médio para a categoria selecionada!')
+        }
+        
+        if (result.qtde > 3){
+            return result.valorMedio
+        }
+
+        return -1
+    }
+
 }

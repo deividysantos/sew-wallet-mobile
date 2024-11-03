@@ -1,6 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity, Modal, Keyboard, Alert, Switch } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Modal, Keyboard, Alert, Switch, TextInput  } from 'react-native';
 import { useRouter } from 'expo-router';
 import BottomSheet from "@gorhom/bottom-sheet";
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
@@ -17,6 +17,7 @@ import { Lancamento } from '@/types/lancamentos';
 import { ContaRepository } from '@/repositories/ContaRespoitory';
 import { LancamentoRepository } from '@/repositories/LancamentoRepository';
 import { CategoriaRepository } from '@/repositories/CategoriaRepository';
+import { ParametroRepository } from '@/repositories/ParametroRepository';
 
 export type LancamentosCreateModal = {
   visible: boolean,
@@ -36,6 +37,12 @@ const LancamentoZerado = {
 };
 
 export default function LancamentosCreateModal( { visible, setVisible, onClose } : LancamentosCreateModal ) {
+
+  const parametroRepository = new ParametroRepository;
+
+  const inputValor = useRef<TextInput>(null);
+  const inputDescricao = useRef<TextInput>(null);
+
   function Close(){
     setVisible(false); 
     setTipoLancamento('');
@@ -149,17 +156,50 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
     setFomulario( (prev) => ({...prev, DATA: date}) );
   };
 
-  async function handleCadastrar(){
-    const lancamentoRepository = new LancamentoRepository;
+  async function handleCadastrar(){const lancamentoRepository = new LancamentoRepository;
 
-    try {
-      await lancamentoRepository.createLancamento(formulario);
-    } catch (e: any) {
-      Alert.alert('Erro ao gravar lançamento!', e.message);
-      return;
+    if (inputValor.current && inputValor.current.isFocused() ) {
+      inputDescricao.current?.focus();
+      return
     }
     
-    Close();
+    const gerarLancamento = async () => {
+      try {
+        await lancamentoRepository.createLancamento(formulario);
+      } catch (e: any) {
+        Alert.alert('Erro ao gravar lançamento!', e.message);
+        return;
+      }
+      
+      Close();
+    }    
+
+    if (tipoLancamento == 'D'){
+      const usaAvisoPorCategoria = await parametroRepository.getParametro(user.USUARIO_ID, 'aviso_gasto_categoria')
+
+      if (usaAvisoPorCategoria == 'S') {
+        const valorMedio = await lancamentoRepository.getMediaPorCategoria(user.USUARIO_ID, formulario.CATEGORIA_ID)
+      
+        if ((formulario.VALOR > (valorMedio + (valorMedio * 0.2)))  && (valorMedio > 0)) {
+          Alert.alert('Alerta de valor do lançamento!', 
+                      'Valor do lançamento atual ultrapassa o valor da média da categoria, deseja continuar?', 
+                      [
+                        {
+                          text: 'Sim', 
+                          style: 'default', 
+                          onPress: () => { gerarLancamento() }
+                        }, 
+                        {
+                          text: 'Não', 
+                          style: 'cancel'
+                        }
+                      ])
+          return;
+        }  
+      }
+    }
+
+    gerarLancamento()
   }
 
   function handleExitValue(){
@@ -263,6 +303,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                     value={ valorString }
                     onChangeText={ (value) => setValorString(value) }
                     onBlur={ handleExitValue }
+                    ref={inputValor}
                   />
                 </View>
 
@@ -311,6 +352,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                 onChangeText={ (novaDesc => setFomulario( (prev) => ({...prev, DESCRICAO: novaDesc}) )) }
                 style={{marginBottom: 7, height: 100}} 
                 multiline
+                ref={inputDescricao}
               />
 
               <ThemedButton 
@@ -391,6 +433,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                     value={ valorString }
                     onChangeText={ (value) => setValorString(value) }
                     onBlur={ handleExitValue }
+                    ref={inputValor}
                   />
                 </View>
 
@@ -442,6 +485,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                 onChangeText={ (novaDesc => setFomulario( (prev) => ({...prev, DESCRICAO: novaDesc}) )) }
                 style={{marginBottom: 7, height: 100, borderColor: 'red'}}
                 multiline
+                ref={inputDescricao}
               />
 
               <ThemedButton 

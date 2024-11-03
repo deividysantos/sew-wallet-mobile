@@ -1,13 +1,20 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { StyleSheet, StatusBar, SafeAreaView, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, StatusBar, SafeAreaView, View, TouchableOpacity, Switch } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-
+import { ParametroRepository } from '@/repositories/ParametroRepository';
+import { useFocusEffect } from '@react-navigation/native';
 import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
+import { useEffect, useState, useCallback } from 'react';
+import { Parametro, parametrosPadroes} from '@/types/parametro';
 
 export default function ConfiguracoesScreen() {
+  const parametroRepository = new ParametroRepository();
+  const { user } = useAuth();
+
   const backgroundHard = useThemeColor({}, 'backgroundHard');
   const backgroundSoft = useThemeColor({}, 'backgroundSoft');
   const primaryColor = useThemeColor({}, 'primary');
@@ -19,6 +26,29 @@ export default function ConfiguracoesScreen() {
   function makeLogout() {
     logout();
     router.replace('/');
+  }
+
+  const [parametros, setParametros] = useState<Parametro[]>([]);
+
+  useEffect(() => {
+    atualizaDados();
+  }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      atualizaDados();
+    }, [])
+  );
+
+  const atualizaDados = async () => {
+    const parametros = await Promise.all(
+      parametrosPadroes.map(async (parametroPadrao) => {
+        const valor = await parametroRepository.getParametro(user.USUARIO_ID, parametroPadrao.nome, parametroPadrao.valor)
+        return { nome: parametroPadrao.nome, valor: valor }
+      })
+    );
+
+    setParametros(parametros)
   }
 
   return (
@@ -42,7 +72,33 @@ export default function ConfiguracoesScreen() {
           <View style={{gap: 10, marginTop: 15}}>
             <ThemedText >Tema Escuro</ThemedText>
             <ThemedText >Saldo oculto ao acessar</ThemedText>
-            <ThemedText >Aviso de elevação de gastos por categoría</ThemedText>
+            <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+              <ThemedText >Alerta de gastos por categoría</ThemedText>
+              <Switch 
+                    style={{height: 30}}
+                    trackColor={{false: '#ccc', true: primaryColor}}
+                    onChange={() => {
+                      const novoParametros = parametros.map( (parametro) => {
+                        return parametro.nome == 'aviso_gasto_categoria' ? {nome: parametro.nome, valor: parametro.valor == 'S' ? 'N' : 'S'} : parametro
+                      })
+
+                      let valorAtualizado = novoParametros.find( parametro => parametro.nome == 'aviso_gasto_categoria' )?.valor;
+
+                      if (!valorAtualizado) {
+                        valorAtualizado = parametrosPadroes.find( parametro => parametro.nome == 'aviso_gasto_categoria')?.valor
+
+                        if (!valorAtualizado) {
+                          valorAtualizado = 'N'
+                        }
+                      }
+                      
+                      parametroRepository.atualizarParametro(user.USUARIO_ID, 'aviso_gasto_categoria', valorAtualizado)
+
+                      setParametros(novoParametros)
+                    }}
+                    value={ parametros.find( parametro => parametro.nome == 'aviso_gasto_categoria' )?.valor == 'S' }
+                  />
+            </ThemedView>
           </View>
       </View>
 
