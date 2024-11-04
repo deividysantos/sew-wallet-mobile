@@ -34,7 +34,7 @@ export function LookUpComboBox({ title, dataList, selectedValue, sheetRef } : Lo
   };
 
   const renderItem = useCallback(
-    ( item ) => (            
+    ( item: { item: {text: string, value: number} } ) => (            
       <TouchableOpacity style={styles.itemContainer} onPress={() => selectedItem({text: item.item.text, value: item.item.value})}>
         <ThemedText style={{color: 'black'}}>{item.item.text}</ThemedText>
       </TouchableOpacity>
@@ -48,7 +48,7 @@ export function LookUpComboBox({ title, dataList, selectedValue, sheetRef } : Lo
         snapPoints={snapPoints}
       >
         {title && 
-          <ThemedText style={{marginHorizontal: 10}} type="subtitle">{title}</ThemedText>
+          <ThemedText style={{marginHorizontal: 10, color: 'black'}} type="subtitle">{title}</ThemedText>
         }
         
         <BottomSheetFlatList
