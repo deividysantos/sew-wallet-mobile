@@ -58,11 +58,7 @@ export default function Index() {
       return accumulator + currentValue.saldo;
     }, 0)
 
-    if (total) {
-      return formatCurrency(total, 'BRL')
-    }
-
-    return ''
+    return formatCurrency(total, 'BRL')
   }
   
   async function getLancamentosPorCategoria(){

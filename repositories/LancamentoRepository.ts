@@ -1,5 +1,6 @@
 import { Lancamento, LancamentoDescrito, ValidateLancamento } from "@/types/lancamentos";
 import * as SQLite from 'expo-sqlite';
+import { formatDateToLocal } from "@/utils/dateUtils";
 
 export type InfoMesType = {
     entradas: number, 
@@ -36,7 +37,7 @@ export class LancamentoRepository {
         
         
         try {
-            await statement.executeAsync({$conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: lancamento.DATA.toISOString().slice(0, 10), $efetivada: lancamento.EFETIVADA});
+            await statement.executeAsync({$conta_id: lancamento.CONTA_ID, $categoria_id: lancamento.CATEGORIA_ID, $titulo: lancamento.TITULO, $descricao: lancamento.DESCRICAO, $valor: lancamento.VALOR, $data: formatDateToLocal(lancamento.DATA), $efetivada: lancamento.EFETIVADA});
         } finally {
             await statement.finalizeAsync();
         }
@@ -140,9 +141,7 @@ export class LancamentoRepository {
         
         if (ano && mes) {
             const ultimoDiaMes = new Date(ano, mes, 0).toISOString().slice(0, 10);
-            const primeiroDiaMes = new Date(ano, mes-1, 1).toISOString().slice(0, 10);
-
-            condicoes = `   AND L.DATA BETWEEN '${primeiroDiaMes}' AND '${ultimoDiaMes}' `
+            condicoes = `   AND L.DATA < '${ultimoDiaMes}' `
         }
 
         const result = db.getAllAsync<DespesasPendentesType>(`

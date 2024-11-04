@@ -17,7 +17,7 @@ import { LancamentoRepository, InfoMesType } from '@/repositories/LancamentoRepo
 import { LancamentoDescrito } from '@/types/lancamentos';
 import { ContaRepository, SaldoContaType, SaldoFuturoType } from '@/repositories/ContaRespoitory';
 
-import { stringToDate } from '@/utils/dateUtils';
+import { formatDateToStr, stringToDate } from '@/utils/dateUtils';
 import { formatCurrency } from '@/utils/currency';
 
 export default function LancamentosScreen() {
@@ -124,8 +124,8 @@ export default function LancamentosScreen() {
 
       const diasSomados = await Promise.all(
         dias.map(async (dia) => {
-          let diaStr = new Date(dia).toLocaleDateString('pt-br');
-          
+          let diaStr = formatDateToStr(dia)
+
           let saldoDia = await contaRepository.getSaldoFuturo(user.USUARIO_ID, undefined, dia);
           
           let saldoDiaSomado = saldoDia.reduce((accumulator: number, currentValue: SaldoFuturoType) => {
@@ -231,7 +231,7 @@ export default function LancamentosScreen() {
             <ThemedView key={dia.dia} style={{marginBottom: 20, padding: 10}}>
               <ThemedText style={{ fontSize: 18, borderTopWidth: 1, borderColor: 'gray' }}> { getDay(dia.dia) } </ThemedText>
               <ThemedView style={{gap: 15}}>
-                {lancamentos.filter((lancamento) => {return dia.dia == new Date(lancamento.DATA).toLocaleDateString('pt-br') }).map((lancamento) => {
+                {lancamentos.filter((lancamento) => {return dia.dia == formatDateToStr(lancamento.DATA) }).map((lancamento) => {
                   return ( 
                     <ThemedView key={lancamento.TITULO}  style={{borderLeftWidth: 2, borderColor: lancamento.TIPO == 'Débito' ? 'red' : 'green' }}>
                       <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
