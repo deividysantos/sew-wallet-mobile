@@ -85,6 +85,7 @@ export default function CategoriasScreen() {
         <SectionList
           sections={categorias}
           keyExtractor={ (item, index) => item.CATEGORIA_NOME+ index }
+          showsVerticalScrollIndicator={false}
 
           renderSectionHeader={({section: { title }}) => (
           <ThemedText type='subtitle' style={{marginBottom: 5}} >{ title }</ThemedText>

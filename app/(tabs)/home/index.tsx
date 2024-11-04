@@ -82,7 +82,9 @@ export default function Index() {
               barStyle={ useThemeColor({}, 'barStyle') == 'dark' ? 'dark-content' : 'light-content'}
               translucent={false}
         />
-        <ScrollView>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+        >
           <DespesasPendentes usuario_id={user.USUARIO_ID} mes={mesAtual.mes} ano={mesAtual.ano} key={key}/>
 
           <ThemedView style={{padding: 12,backgroundColor: backgroundSoft, margin: 10, borderRadius: 5, shadowColor: "#ccc", shadowOffset: { width: 5, height: 3, }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 4 }}>

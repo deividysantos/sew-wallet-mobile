@@ -52,6 +52,7 @@ export default function DespesasPendentes ( { usuario_id, mes, ano }: DespesasPe
             {!loading &&
             <ScrollView
                 horizontal
+                showsHorizontalScrollIndicator= {false}
             >
                 <ThemedView style={{gap: 15, flexDirection: 'row'}}>
                 {(despesasPendentes != undefined) && (despesasPendentes.length > 0) ?

@@ -223,7 +223,9 @@ export default function LancamentosScreen() {
           </ThemedView>
         </ThemedView>
 
-        <ScrollView>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+        >
           {diasComLancamentos.filter((dia) => {
             return stringToDate(dia.dia).getMonth() == mesSelecionado
           }).map((dia) => {

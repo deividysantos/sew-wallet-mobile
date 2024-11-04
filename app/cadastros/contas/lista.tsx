@@ -112,6 +112,7 @@ export default function ContasScreen() {
         /> 
 
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={contas}
           renderItem={(conta) => 
           
