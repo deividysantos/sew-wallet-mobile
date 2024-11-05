@@ -63,6 +63,8 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
   const backgroundSoft = useThemeColor({}, 'backgroundSoft');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
   const primaryColor = useThemeColor({}, 'primary');
+  const redColor = useThemeColor({}, 'red');
+  const grennColor = useThemeColor({}, 'green');
 
   const [tipoLancamento, setTipoLancamento] = useState('');
   useEffect(() => {
@@ -265,7 +267,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
         }
 
         {tipoLancamento === 'R' && <>
-            <TouchableOpacity  style={[styles.receber, {backgroundColor: backgroundSoft}]} activeOpacity={1}>
+            <TouchableOpacity  style={[styles.receber, {backgroundColor: backgroundSoft, borderColor: grennColor, borderTopWidth: 2}]} activeOpacity={1}>
               
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -290,7 +292,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
 
               <ThemedText> Título </ThemedText>
               <ThemedTextInput 
-                style={{marginBottom: 7}} 
+                style={{marginBottom: 7,borderColor: backgroundHard, borderWidth: 2}} 
                 value={formulario.TITULO}
                 onChangeText={ (novoTitulo => setFomulario( (prev) => ({...prev, TITULO: novoTitulo}) ) ) }
               />
@@ -300,7 +302,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                   <ThemedText >Valor</ThemedText>  
                   <ThemedTextInput 
                     keyboardType = 'numeric'
-                    style={{marginBottom: 7}}
+                    style={{marginBottom: 7,borderColor: backgroundHard, borderWidth: 2}}
                     value={ valorString }
                     onChangeText={ (value) => setValorString(value) }
                     onBlur={ handleExitValue }
@@ -317,6 +319,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                       openLookUpCategorias();
                     }} 
                     showSoftInputOnFocus={false}
+                    style={{borderColor: backgroundHard, borderWidth: 2}}
                   />
                 </View>
               </View>          
@@ -331,6 +334,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                       openLookUpContas();
                     }} 
                     showSoftInputOnFocus={false}
+                    style={{borderColor: backgroundHard, borderWidth: 2}}
                   />
                 </View>
 
@@ -343,6 +347,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                       setExibeDatePicker(true);
                     }}
                     showSoftInputOnFocus={false}
+                    style={{borderColor: backgroundHard, borderWidth: 2}}
                   />
                 </View>
               </View>
@@ -351,13 +356,13 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
               <ThemedTextInput 
                 value={formulario.DESCRICAO.toString()}
                 onChangeText={ (novaDesc => setFomulario( (prev) => ({...prev, DESCRICAO: novaDesc}) )) }
-                style={{marginBottom: 7, height: 100}} 
+                style={{marginBottom: 7, height: 100, borderColor: backgroundHard, borderWidth: 2}} 
                 multiline
                 ref={inputDescricao}
               />
 
               <ThemedButton 
-                style={{alignItems: 'center', marginTop: 10}} 
+                style={{alignItems: 'center', marginTop: 10, borderColor: backgroundHard, borderWidth: 2, backgroundColor: backgroundHard}} 
                 text='Cadastrar' 
                 onPress={handleCadastrar}
               />
@@ -395,11 +400,11 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
         </>}
 
         {tipoLancamento === 'D' && <>
-            <TouchableOpacity  style={[styles.receber, {backgroundColor: backgroundSoft}]} activeOpacity={1}>
+            <TouchableOpacity  style={[styles.receber, {backgroundColor: backgroundSoft, borderColor: redColor, borderTopWidth: 2}]} activeOpacity={1}>
               
               <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                 <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between' }} >
-                  <ThemedText type='subtitle' style={{marginBottom: 10}}> Despesa </ThemedText>
+                  <ThemedText type='subtitle' style={{marginBottom: 10,}}> Despesa </ThemedText>
                   <Switch 
                       style={{height: 30}}
                       trackColor={{false: '#ccc', true: primaryColor}}
@@ -420,7 +425,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
 
               <ThemedText> Título </ThemedText>
               <ThemedTextInput 
-                style={{marginBottom: 7, borderColor: 'red'}} 
+                style={{marginBottom: 7, borderColor: backgroundHard, borderWidth: 2}} 
                 value={formulario.TITULO}
                 onChangeText={ (novoTitulo => setFomulario( (prev) => ({...prev, TITULO: novoTitulo}) ) ) }
               />
@@ -430,7 +435,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                   <ThemedText >Valor</ThemedText>  
                   <ThemedTextInput 
                     keyboardType = 'numeric'
-                    style={{marginBottom: 7, borderColor: 'red'}}
+                    style={{marginBottom: 7, borderColor: backgroundHard, borderWidth: 2}}
                     value={ valorString }
                     onChangeText={ (value) => setValorString(value) }
                     onBlur={ handleExitValue }
@@ -446,7 +451,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                       Keyboard.dismiss();
                       openLookUpCategorias();
                     }} 
-                    style={{borderColor: 'red'}}
+                    style={{borderColor: backgroundHard, borderWidth: 2}}
                     showSoftInputOnFocus={false}
                   />
                 </View>
@@ -462,7 +467,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                       openLookUpContas();
                     }} 
                     showSoftInputOnFocus={false}
-                    style={{borderColor: 'red'}}
+                    style={{borderColor: backgroundHard, borderWidth: 2}}
                   />
                 </View>
 
@@ -475,7 +480,7 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
                       setExibeDatePicker(true);
                     }}
                     showSoftInputOnFocus={false}
-                    style={{borderColor: 'red'}}
+                    style={{borderColor: backgroundHard, borderWidth: 2}}
                   />
                 </View>
               </View>           
@@ -484,13 +489,13 @@ export default function LancamentosCreateModal( { visible, setVisible, onClose }
               <ThemedTextInput 
                 value={formulario.DESCRICAO.toString()}
                 onChangeText={ (novaDesc => setFomulario( (prev) => ({...prev, DESCRICAO: novaDesc}) )) }
-                style={{marginBottom: 7, height: 100, borderColor: 'red'}}
+                style={{marginBottom: 7, height: 100, borderColor: backgroundHard, borderWidth: 2}}
                 multiline
                 ref={inputDescricao}
               />
 
               <ThemedButton 
-                style={{alignItems: 'center', marginTop: 10, borderColor: 'red'}} 
+                style={{alignItems: 'center', marginTop: 10, borderColor: backgroundHard, borderWidth: 2, backgroundColor: backgroundHard}} 
                 text='Cadastrar'
                 onPress={handleCadastrar}
               />
@@ -550,8 +555,8 @@ const styles = StyleSheet.create({
   receber: {
     marginTop: 'auto',
     height: 'auto',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
     padding: 20,
     marginHorizontal: 15
   },

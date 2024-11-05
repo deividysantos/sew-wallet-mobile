@@ -15,6 +15,8 @@ export const Colors = {
     backgroupTextInput: '#2A3942',
     placeholderColor: '#302e30',
     barStyle: 'dark',
+    red: '#ff5733',
+    green: '#33ff57'
   },
   dark: {
     text: '#ECEDEE',
@@ -28,5 +30,7 @@ export const Colors = {
     tabIconSelected: tintColorDark,
     placeholderColor: '#C9C9C9',
     barStyle: 'light',
+    red: '#ff5733',
+    green: '#33ff57'
   },
 };

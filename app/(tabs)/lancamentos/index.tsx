@@ -28,6 +28,8 @@ export default function LancamentosScreen() {
   const backgroundSoft = useThemeColor({}, 'backgroundSoft');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
   const primaryColor = useThemeColor({}, 'primary')
+  const redColor = useThemeColor({}, 'red')
+  const greenColor = useThemeColor({}, 'green')
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -235,7 +237,7 @@ export default function LancamentosScreen() {
               <ThemedView style={{gap: 15}}>
                 {lancamentos.filter((lancamento) => {return dia.dia == formatDateToStr(lancamento.DATA) }).map((lancamento) => {
                   return ( 
-                    <ThemedView key={lancamento.TITULO}  style={{borderLeftWidth: 2, borderColor: lancamento.TIPO == 'Débito' ? 'red' : 'green' }}>
+                    <ThemedView key={lancamento.TITULO}>
                       <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
                           
                           <ThemedView style={{ flexDirection: 'column' }}>
@@ -249,7 +251,7 @@ export default function LancamentosScreen() {
                           </ThemedView>
                           
                           <ThemedView style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
-                            <ThemedText>{formatCurrency(lancamento.VALOR, 'BRL')}</ThemedText>
+                            <ThemedText style={{ color: lancamento.TIPO == 'Débito' ? redColor : greenColor }} >{formatCurrency(lancamento.VALOR, 'BRL')}</ThemedText>
                             <Switch
                               style={{height: 30}}
                               trackColor={{false: '#ccc', true: primaryColor}}

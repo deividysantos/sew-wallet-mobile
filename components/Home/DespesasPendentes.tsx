@@ -17,6 +17,7 @@ export type DespesasPendentesProps = {
 export default function DespesasPendentes ( { usuario_id, mes, ano }: DespesasPendentesProps ){
     const text = useThemeColor({}, 'text');
     const backgroundSoft = useThemeColor({}, 'backgroundSoft');
+    const redColor = useThemeColor({}, 'red');
 
     const [despesasPendentes, setDepespesasPendentes] = useState<DespesasPendentesType[]|null>(null);
     const [loading, setLoading] = useState(true);
@@ -60,7 +61,7 @@ export default function DespesasPendentes ( { usuario_id, mes, ano }: DespesasPe
                     return (
                         <ThemedView key={i} style={{flexDirection: 'column', backgroundColor: backgroundSoft, padding: 7, borderRadius: 8, width: 150, shadowColor: "#ccc", shadowOffset: { width: 5, height: 3, }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 4 }}>
                             <ThemedText>{despesa.nome}</ThemedText>
-                            <ThemedText style={{color: 'red'}}>{ formatCurrency(despesa.valor, 'BRL') }</ThemedText>
+                            <ThemedText style={{color: redColor}}>{ formatCurrency(despesa.valor, 'BRL') }</ThemedText>
                             <ThemedText>{ new Date(despesa.data).toLocaleDateString('pt-br') }</ThemedText>
                         </ThemedView>
                     )
