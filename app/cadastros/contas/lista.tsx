@@ -120,7 +120,7 @@ export default function ContasScreen() {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <ThemedText type='subtitle' > { conta.item.contas.NOME_CONTA } </ThemedText>
               <TouchableOpacity onPress={() => handleDelete(conta.item.contas.CONTA_ID)}>
-                <Ionicons size={20} name="trash" style={{color: '#fff'}} />
+                <Ionicons size={20} name="trash" style={{color: text}} />
               </TouchableOpacity>
             </View> 
 

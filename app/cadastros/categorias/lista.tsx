@@ -98,7 +98,7 @@ export default function CategoriasScreen() {
                 <TouchableOpacity
                   onPress={ () => {handleDeleteCategoria(item.CATEGORIA_ID)} }
                 >
-                  <Ionicons name='trash' size={20} style={{ color: '#ccc' }} />
+                  <Ionicons name='trash' size={20} style={{ color: text }} />
                 </TouchableOpacity>
                 
               </ThemedView> 
