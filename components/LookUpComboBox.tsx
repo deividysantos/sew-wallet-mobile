@@ -22,7 +22,7 @@ export function LookUpComboBox({ title, dataList, selectedValue, sheetRef } : Lo
     []
   );
 
-  const snapPoints = useMemo(() => ["50%","90%"], []);
+  const snapPoints = useMemo(() => ["40%","75%", "90%"], []);
 
   const handleClosePress = useCallback(() => {
     sheetRef.current?.close();

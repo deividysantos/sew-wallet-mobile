@@ -136,7 +136,13 @@ export default function ContasScreen() {
       </View>
 
       {bancoList && showLookup &&
-        <LookUpComboBox children dataList={bancoList} sheetRef={sheetRef} selectedValue={setBanco} /> 
+        <LookUpComboBox 
+          children 
+          dataList={bancoList} 
+          sheetRef={sheetRef} 
+          selectedValue={setBanco}
+          title='Bancos'
+        /> 
       }
         
     </SafeAreaView>
