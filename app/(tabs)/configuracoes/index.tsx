@@ -51,6 +51,26 @@ export default function ConfiguracoesScreen() {
     setParametros(parametros)
   }
 
+  const handleChangeParamAlertaGasto = () => {
+    const novoParametros = parametros.map( (parametro) => {
+      return parametro.nome == 'aviso_gasto_categoria' ? {nome: parametro.nome, valor: parametro.valor == 'S' ? 'N' : 'S'} : parametro
+    })
+
+    let valorAtualizado = novoParametros.find( parametro => parametro.nome == 'aviso_gasto_categoria' )?.valor;
+
+    if (!valorAtualizado) {
+      valorAtualizado = parametrosPadroes.find( parametro => parametro.nome == 'aviso_gasto_categoria')?.valor
+
+      if (!valorAtualizado) {
+        valorAtualizado = 'N'
+      }
+    }
+    
+    parametroRepository.atualizarParametro(user.USUARIO_ID, 'aviso_gasto_categoria', valorAtualizado)
+
+    setParametros(novoParametros)
+  }  
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: backgroundHard }]}>
         <StatusBar
@@ -72,33 +92,18 @@ export default function ConfiguracoesScreen() {
           <View style={{gap: 10, marginTop: 15}}>
             <ThemedText >Tema Escuro</ThemedText>
             <ThemedText >Saldo oculto ao acessar</ThemedText>
-            <ThemedView style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+            <TouchableOpacity
+              style={{flexDirection: 'row', justifyContent: 'space-between'}}
+              onPress={handleChangeParamAlertaGasto}
+            >
               <ThemedText >Alerta de gastos por categoría</ThemedText>
               <Switch 
                     style={{height: 30}}
                     trackColor={{false: '#ccc', true: primaryColor}}
-                    onChange={() => {
-                      const novoParametros = parametros.map( (parametro) => {
-                        return parametro.nome == 'aviso_gasto_categoria' ? {nome: parametro.nome, valor: parametro.valor == 'S' ? 'N' : 'S'} : parametro
-                      })
-
-                      let valorAtualizado = novoParametros.find( parametro => parametro.nome == 'aviso_gasto_categoria' )?.valor;
-
-                      if (!valorAtualizado) {
-                        valorAtualizado = parametrosPadroes.find( parametro => parametro.nome == 'aviso_gasto_categoria')?.valor
-
-                        if (!valorAtualizado) {
-                          valorAtualizado = 'N'
-                        }
-                      }
-                      
-                      parametroRepository.atualizarParametro(user.USUARIO_ID, 'aviso_gasto_categoria', valorAtualizado)
-
-                      setParametros(novoParametros)
-                    }}
                     value={ parametros.find( parametro => parametro.nome == 'aviso_gasto_categoria' )?.valor == 'S' }
+                    onChange={handleChangeParamAlertaGasto}
                   />
-            </ThemedView>
+            </TouchableOpacity>
           </View>
       </View>
 

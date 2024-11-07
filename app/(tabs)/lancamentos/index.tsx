@@ -28,6 +28,8 @@ export default function LancamentosScreen() {
   const backgroundSoft = useThemeColor({}, 'backgroundSoft');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
   const primaryColor = useThemeColor({}, 'primary')
+  const redColor = useThemeColor({}, 'red')
+  const greenColor = useThemeColor({}, 'green')
 
   const navigation = useNavigation();
   useEffect(() => {
@@ -249,7 +251,7 @@ export default function LancamentosScreen() {
                           </ThemedView>
                           
                           <ThemedView style={{ flexDirection: 'column', alignItems: 'flex-end' }}>
-                            <ThemedText>{formatCurrency(lancamento.VALOR, 'BRL')}</ThemedText>
+                            <ThemedText style={{ color: lancamento.TIPO == 'Débito' ? redColor : greenColor }} >{formatCurrency(lancamento.VALOR, 'BRL')}</ThemedText>
                             <Switch
                               style={{height: 30}}
                               trackColor={{false: '#ccc', true: primaryColor}}
