@@ -74,14 +74,15 @@ export default function Index() {
                 placeholder='Senha' 
                 value={ formLogin.senha }
                 secureTextEntry={!senhaVisivel}
-                onChangeText={novaSenha => setformLogin({email: formLogin.email, senha: novaSenha})}/>
-                <TouchableOpacity
-                  style={{position: 'absolute', right: 3, top: 5, width: 40, height: 40, justifyContent: 'center', }}
-                  onPress={ () => {
-                    setSenhaVisivel(!senhaVisivel)
-                  } }
-                >
-                  <Ionicons size={30} name={senhaVisivel ? "eye" : "eye-off"} style={{color: primaryColor}} />
+                onChangeText={novaSenha => setformLogin({email: formLogin.email, senha: novaSenha})}
+              />
+              <TouchableOpacity
+                style={{position: 'absolute', right: 3, top: 5, width: 40, height: 40, justifyContent: 'center', }}
+                onPress={ () => {
+                  setSenhaVisivel(!senhaVisivel)
+                } }
+              >
+                <Ionicons size={30} name={senhaVisivel ? "eye" : "eye-off"} style={{color: primaryColor}} />
                 </TouchableOpacity>
             </View>
           </View>

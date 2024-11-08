@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, View, Alert } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Link, router, Stack } from 'expo-router';
@@ -22,6 +23,8 @@ export default function Index() {
     email: '',
     senha: ''
   });
+
+  const [ senhaVisivel, setSenhaVisivel ] = useState(false);
 
   async function handleBanco () {
     const db = await SQLite.openDatabaseAsync('sew-wallet.db');
@@ -74,11 +77,25 @@ export default function Index() {
                 value={form.email} 
                 onChangeText={(novoEmail => setForm( (formAterior) => ({ ...formAterior, email: novoEmail }) ))}/>
               
-              <ThemedTextInput 
-                style={styles.textInput} 
-                placeholder='Senha' 
-                value={form.senha} 
-                onChangeText={(novaSenha => setForm( (formAterior) => ({ ...formAterior, senha: novaSenha }) ))}/>
+              <View
+                style={{flexDirection: 'row'}}
+              >
+                <ThemedTextInput 
+                  style={styles.textInput} 
+                  placeholder='Senha'
+                  secureTextEntry={!senhaVisivel}
+                  value={form.senha} 
+                  onChangeText={(novaSenha => setForm( (formAterior) => ({ ...formAterior, senha: novaSenha }) ))}
+                />
+                <TouchableOpacity
+                  style={{position: 'absolute', right: 3, top: 5, width: 40, height: 40, justifyContent: 'center', }}
+                  onPress={ () => {
+                    setSenhaVisivel(!senhaVisivel)
+                  } }
+                >
+                  <Ionicons size={30} name={senhaVisivel ? "eye" : "eye-off"} style={{color: primaryColor}} />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <ThemedButton 
