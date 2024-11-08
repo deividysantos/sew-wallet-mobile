@@ -12,6 +12,7 @@ export async function initDataBase (){
         let result = await db.getFirstAsync<{NUMERO: number}>('SELECT NUMERO FROM VERSAO WHERE NUMERO = 1');
         
         if (result?.NUMERO) {
+            db.closeAsync();
             return 
         }
     } catch (error) {

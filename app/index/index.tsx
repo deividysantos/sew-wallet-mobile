@@ -10,12 +10,18 @@ import { UsuarioRepository } from '@/repositories/UsuarioRespository';
 import { UsuarioLogin } from '@/types/usuario';
 import { ThemedButton } from '@/components/ThemedButton';
 
+import { initDataBase } from '@/database/database';
+
 export default function Index() {
   const router = useRouter();
   const backgroundColorButton = useThemeColor({}, 'secondary');
   const primaryColor = useThemeColor({}, 'primary');
   const backgroundHard = useThemeColor({}, 'backgroundHard');
   const { login } = useAuth();
+
+  useEffect( () => {
+    initDataBase()
+  }, [])
 
   const [ formLogin, setformLogin ] = useState<UsuarioLogin>({email: 'admin@admin.com', senha: 'senha123'});
   async function handleLogin () {
