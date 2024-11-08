@@ -68,7 +68,7 @@ export default function LancamentosScreen() {
   }, [])
 
   useEffect(()=> {
-
+    
     if (mesSelecionado < 0) {
       setMesSelecionado(11);
       return;
@@ -140,7 +140,6 @@ export default function LancamentosScreen() {
       
       setDiasComLancamentos(diasSomados);
       setLancamentos(result);
-      getInfo();
     } catch (e:any){
       console.log(e.message);
     }
@@ -237,7 +236,7 @@ export default function LancamentosScreen() {
               <ThemedView style={{gap: 15}}>
                 {lancamentos.filter((lancamento) => {return dia.dia == formatDateToStr(lancamento.DATA) }).map((lancamento) => {
                   return ( 
-                    <ThemedView key={lancamento.LANCAMENTO_ID}  style={{borderLeftWidth: 2, borderColor: lancamento.TIPO == 'Débito' ? 'red' : 'green' }}>
+                    <ThemedView key={lancamento.LANCAMENTO_ID}>
                       <ThemedView style={{ flexDirection: 'row', justifyContent: 'space-between', padding: 5, borderTopLeftRadius: 5, borderTopRightRadius: 5}}>
                           
                           <ThemedView style={{ flexDirection: 'column' }}>
