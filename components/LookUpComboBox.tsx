@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import BottomSheet, { BottomSheetFlatList, BottomSheetProps } from "@gorhom/bottom-sheet";
+import BottomSheet, { BottomSheetFlatList, BottomSheetProps, BottomSheetBackdrop, BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
 import { ThemedText } from "./ThemedText";
 
 export type FieldResult = {
@@ -33,6 +33,18 @@ export function LookUpComboBox({ title, dataList, selectedValue, sheetRef } : Lo
     handleClosePress();
   };
 
+	const renderBackdrop = useCallback(
+		(props: BottomSheetBackdropProps) => (
+			<BottomSheetBackdrop
+				{...props}
+        pressBehavior={"close"}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+			/>
+		),
+		[]
+	);
+
   const renderItem = useCallback(
     ( item: { item: {text: string, value: number} } ) => (            
       <TouchableOpacity style={styles.itemContainer} onPress={() => selectedItem({text: item.item.text, value: item.item.value})}>
@@ -46,6 +58,8 @@ export function LookUpComboBox({ title, dataList, selectedValue, sheetRef } : Lo
       <BottomSheet
         ref={sheetRef}
         snapPoints={snapPoints}
+        backdropComponent={renderBackdrop}
+        enablePanDownToClose
       >
         {title && 
           <ThemedText style={{marginHorizontal: 10, color: 'black'}} type="subtitle">{title}</ThemedText>
