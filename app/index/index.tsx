@@ -1,4 +1,5 @@
-import { StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, View, Alert } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { StyleSheet, StatusBar, SafeAreaView, View, Alert, TouchableOpacity } from 'react-native';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { Link, Stack, useRouter } from 'expo-router';
 
@@ -24,6 +25,7 @@ export default function Index() {
   }, [])
 
   const [ formLogin, setformLogin ] = useState<UsuarioLogin>({email: 'admin@admin.com', senha: 'senha123'});
+  const [ senhaVisivel, setSenhaVisivel ] = useState(false);
   async function handleLogin () {
 
     try {
@@ -64,11 +66,24 @@ export default function Index() {
               value={formLogin.email} 
               onChangeText={novoEmail => setformLogin({ email: novoEmail, senha: formLogin.senha })}/>
 
-            <ThemedTextInput 
-              style={styles.textInput} 
-              placeholder='Senha' 
-              value={ formLogin.senha }
-              onChangeText={novaSenha => setformLogin({email: formLogin.email, senha: novaSenha})}/>
+            <View
+              style={{flexDirection: 'row'}}
+            >
+              <ThemedTextInput 
+                style={styles.textInput} 
+                placeholder='Senha' 
+                value={ formLogin.senha }
+                secureTextEntry={!senhaVisivel}
+                onChangeText={novaSenha => setformLogin({email: formLogin.email, senha: novaSenha})}/>
+                <TouchableOpacity
+                  style={{position: 'absolute', right: 3, top: 5, width: 40, height: 40, justifyContent: 'center', }}
+                  onPress={ () => {
+                    setSenhaVisivel(!senhaVisivel)
+                  } }
+                >
+                  <Ionicons size={30} name={senhaVisivel ? "eye" : "eye-off"} style={{color: primaryColor}} />
+                </TouchableOpacity>
+            </View>
           </View>
 
           <ThemedButton 
